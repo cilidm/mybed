@@ -1,0 +1,129 @@
+<!DOCTYPE html>
+<html>
+<head>
+    <meta charset="utf-8">
+    <meta name="keywords" content="{{.Config.KeyWord}}" />
+    <meta name="description" content="{{.Config.SiteDescription}}" />
+    <meta name="viewport" content="width=device-width, initial-scale=1, maximum-scale=1">
+    <title>{{.Config.WebName}}</title>
+    <link rel="stylesheet" href="/static/home/layui/layui/css/layui.css">
+    <link rel="stylesheet" type="text/css" href="/static/home/webupload/css/bootstrap.min.css">
+    <link rel="stylesheet" type="text/css" href="/static/home/webupload/css/webuploader.css">
+    <link rel="stylesheet" type="text/css" href="/static/home/webupload/css/demo.css">
+    <style>
+        .btn-copy{background: #00b7ee;}
+        a{text-decoration:none}
+        a:hover{text-decoration:none}
+        .layui-layout-admin .layui-logo{color:#fff}
+        .layui-layout-admin .layui-footer{left:0;text-align:center}
+        .layui-upload-choose{display:none}
+        #multiple{width:100%;-moz-box-sizing:border-box;-o-box-sizing:border-box;-ms-box-sizing:border-box;box-sizing:border-box}
+        #uploadDemoView{margin-top:10px;padding-top:10px;border-top:1px solid #eee}
+        .uploadBox{padding:0 30px;width:80%;margin:0 auto;margin-bottom:44px}
+        .layui-table{text-align:center}
+        .layui-tab-title{text-align:center}
+    </style>
+</head>
+<body>
+<div class="layui-layout layui-layout-admin">
+    {{template "index_header" .}}
+    <div class="uploadBox">
+        {{template "login_frame"}}
+        <div class="page-body">
+            <div id="post-container" class="container">
+                <div class="page-container">
+                    <h1 id="demo">{{.Config.WebName}}</h1>
+                    <p>本站不得上传任何形式的非法图片，一旦发现，永久删除并禁封账户。情节严重者将相关资料交于相关部门处理。</p>
+                    <div id="uploader" class="wu-example">
+                        <div class="queueList">
+                            <div id="dndArea" class="placeholder">
+                                {{if eq .Upload.AllowUpload 1}}
+                                    <div id="filePicker"></div>
+                                    <p>或将照片拖到这里，单次最多可选{{.Upload.ImgCount}}张</p>
+                                {{else}}
+                                    <p>管理员已禁止游客上传，请登陆</p>
+                                {{end}}
+                            </div>
+                        </div>
+                        <div class="statusBar" style="display:none;">
+                            <div class="progress">
+                                <span class="text">0%</span>
+                                <span class="percentage"></span>
+                            </div><div class="info"></div>
+                            <div class="btns">
+                                <div id="filePicker2"></div><div class="uploadBtn">开始上传</div>
+                            </div>
+                        </div>
+                    </div>
+
+                </div>
+            </div>
+            <div class="successAppend layui-hide">
+                <div class="layui-tab layui-tab-brief" lay-filter="docDemoTabBrief">
+                    <ul class="layui-tab-title">
+                        <li class="layui-this">URL</li>
+                        <li>HTML</li>
+                        <li>Markdown</li>
+                        <li>BBCode</li>
+                    </ul>
+                    <div class="layui-tab-content">
+                        <div class="layui-tab-item layui-show">
+                            <table class="layui-table" lay-even="" lay-skin="nob">
+                                <tbody id="url_table"></tbody>
+                            </table>
+                        </div>
+                        <div class="layui-tab-item">
+                            <table class="layui-table" lay-even="" lay-skin="nob">
+                                <tbody id="html_table"></tbody>
+                            </table>
+                        </div>
+                        <div class="layui-tab-item">
+                            <table class="layui-table" lay-even="" lay-skin="nob">
+                                <tbody id="markdown_table"></tbody>
+                            </table>
+                        </div>
+                        <div class="layui-tab-item">
+                            <table class="layui-table" lay-even="" lay-skin="nob">
+                                <tbody id="bbcode_table"></tbody>
+                            </table>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+    <div class="layui-footer" style="color: #8D8D8D">
+        <!-- 底部固定区域 -->
+        © {{.Config.Copyright}} <a style="color: #8D8D8D" href="http://www.beian.miit.gov.cn" target="_blank">{{.Config.RecordInfo}}</a>
+    </div>
+</div>
+
+<script type="text/javascript">
+    // 添加全局站点信息
+    var BASE_URL = '/static/home/webupload';
+</script>
+<script src="/static/home/clipboard.min.js"></script>
+<script type="text/javascript" src="/static/home/webupload/js/jquery-1.10.2.min.js"></script>
+<script type="text/javascript" src="/static/home/webupload/js/bootstrap.min.js"></script>
+<script type="text/javascript" src="/static/home/webupload/js/global.js"></script>
+<script type="text/javascript" src="/static/home/webupload/js/webuploader.js"></script>
+<script src="static/admin/js/bootstrap-notify.min.js"></script>
+<script type="text/javascript" src="static/admin/js/lightyear.js"></script>
+<script src="/static/home/layui/layui/layui.js"></script>
+{{template "wb_js" .}}
+{{template "login_frame_js" .}}
+<script>
+    layui.use(['element','upload'], function(){
+        var $ = layui.jquery ,element = layui.element,upload = layui.upload;
+    });
+    var clipboard = new ClipboardJS('.copybtn');
+    clipboard.on('success', function(e) {
+        layer.msg("复制成功")
+    });
+    clipboard.on('error', function(e) {
+        layer.msg("复制失败")
+    });
+</script>
+</body>
+</html>
+

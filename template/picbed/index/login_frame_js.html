@@ -1,0 +1,381 @@
+{{define "login_frame_js"}}
+    <script src="/static/home/verify/verify.js"></script>
+    <script>
+        var verification = false;
+        function toregister() {
+            var html = '<p style="display: block;float: right;margin-top: 5px; cursor:pointer;margin-right: 13px;font-size: 24px;" onclick="Closelogin()">×</p>\n' +
+                '            <div class="login-top" style="margin-top: 50px;">\n' +
+                '                注册\n' +
+                '            </div>\n' +
+                '            <p align="center" style="color: #db5860;margin-top: -40px;" id="zcts"></p>\n' +
+                '            <div class="login-center clearfix">\n' +
+                '                <div class="login-center-input">\n' +
+                '                    <input type="text" id="registerusername" name="username" value="" placeholder="请输入用户名(数字/字母不得超过10位)" onfocus="this.placeholder=\'\'" onblur="this.placeholder=\'用户名(数字/字母不得超过10位)\'"/>\n' +
+                '                    <div class="login-center-input-text">用户名</div>\n' +
+                '                </div>\n' +
+                '            </div>\n' +
+                '            <div class="login-center clearfix">\n' +
+                '                <div class="login-center-input">\n' +
+                '                    <input type="text" id="registeremail" name="email" value="" placeholder="请输入邮箱" onfocus="this.placeholder=\'\'" onblur="this.placeholder=\'待验证的邮箱\'"/>\n' +
+                '                    <div class="login-center-input-text">邮箱</div>\n' +
+                '                </div>\n' +
+                '            </div>\n' +
+                '            <div class="login-center clearfix">\n' +
+                '                <div class="login-center-input">\n' +
+                '                    <input type="password" id="registerpassword" name="password" value="" placeholder="请输入您的密码" onfocus="this.placeholder=\'\'" onblur="this.placeholder=\'请输入您的密码\'"/>\n' +
+                '                    <div class="login-center-input-text">密码</div>\n' +
+                '                </div>\n' +
+                '            </div>\n' +
+                '            <div class="login-center clearfix">\n' +
+                '                <div class="login-center-input">\n' +
+                '                    <input type="password" id="registerpassword_confirmation" name="password" value="" placeholder="请再次输入您的密码" onfocus="this.placeholder=\'\'" onblur="this.placeholder=\'请输入您的密码\'"/>\n' +
+                '                    <div class="login-center-input-text">确认密码</div>\n' +
+                '                </div>\n' +
+                '            </div>\n' +
+                '            <div class="login-center clearfix">\n' +
+                '                <div style="width: 280px;height: 50px;">\n' +
+                '                    <div id="mpanel2" onselectstart="return true"></div>\n' +
+                '                </div>\n' +
+                '            </div>\n' +
+                '            <div class="login-button" onclick="checkForm();">\n' +
+                '                注册\n' +
+                '            </div>';
+
+            $('.login').html(html);
+            $('#zhezhao').show();
+            $('.login').show();
+            $('.login').addClass('animated  slideInDown');
+            $('body').css({
+                "overflow-x":"hidden",
+                "overflow-y":"hidden"
+            });
+            initSlideVerify(2);
+        }
+
+        //验证邮箱
+        function checkForm() {
+            $("#userzc").css('display','none');
+            $("#zctishi").css('display','block');
+            var registerusername = $("#registerusername").val();
+            var mail = $("#registeremail").val();
+            var registerpassword = $("#registerpassword").val();
+            var registerpassword_confirmation = $("#registerpassword_confirmation").val();
+
+            var ze2 = /^(\d|[a-zA-Z])+$/;
+            if (ze2.test(registerusername) == false || registerusername.length>10) {
+                shakeModal(1);
+                $("#userzc").css('display','block');
+                $("#zctishi").css('display','none');
+                return false;
+            }
+            if (mail == "") {
+                shakeModal(5);
+                $("#userzc").css('display','block');
+                $("#zctishi").css('display','none');
+                return false;
+            }
+            var ze = /^\w+@\w+(\.[a-zA-Z]{2,3}){1,2}$/;
+            if (ze.test(mail) == false) {
+                shakeModal(2);
+                $("#userzc").css('display','block');
+                $("#zctishi").css('display','none');
+                return false;
+            }
+
+            if (registerpassword != "" && registerpassword != null) {
+                if (registerpassword == registerpassword_confirmation) {
+                    regHandler(mail, registerusername, registerpassword);
+                    return true;
+                } else {
+                    shakeModal(3);
+                    $("#userzc").css('display','block');
+                    $("#zctishi").css('display','none');
+                    return false;
+                }
+            }else{
+                shakeModal(4);
+                $("#userzc").css('display','block');
+                $("#zctishi").css('display','none');
+                return false;
+            }
+        }
+
+        function shakeModal(val) {
+            $('#loginModal .modal-dialog').addClass('shake');
+            if(val==1){
+                layer.msg("用户名格式不正确", {icon: 2});
+            }else if(val==2){
+                layer.msg("无效的电子邮件", {icon: 2});
+            }else if(val==3){
+                layer.msg("密码输入不一致", {icon: 2});
+            }else if(val==4){
+                layer.msg("密码不能为空", {icon: 2});
+            }else if(val==5){
+                layer.msg("邮箱不能为空", {icon: 2});
+            }else if(val==6){
+                layer.msg("未通过验证码校验", {icon: 2});
+            }else{
+                //$('#zcts').text('');
+            }
+            $('input[type="password"]').val('');
+            setTimeout(function () {
+                $('#loginModal .modal-dialog').removeClass('shake');
+            }, 1000);
+        }
+
+        function regHandler(mail, registerusername, registerpassword) {
+            if(zcverification){
+                //验证成功
+                $.ajax({
+                    type: "POST",
+                    url: "/register",
+                    data: {email: mail, username: registerusername, password: registerpassword},
+                    dataType: "json",
+                    success: function (data) {
+                        if (data.ret > 0) {
+                            $("#zctishi").text('注册成功');
+                            if (data.zctype == 1) {
+                                layer.alert('注册成功，请前往邮箱激活你的账号，注意！激活邮件如果迟迟未收到，有可能在您的【垃圾箱】中。', {
+                                    skin: 'layui-layer-molv'
+                                    ,closeBtn: 0
+                                    ,anim: 1
+                                    ,btn: ['确定']
+                                    ,icon: 1
+                                    ,yes:function(){
+                                        window.location.reload();
+                                    }
+                                });
+                            } else {
+                                layer.alert('注册成功，请登陆。', {
+                                    skin: 'layui-layer-molv'
+                                    ,closeBtn: 0
+                                    ,anim: 1
+                                    ,btn: ['确定']
+                                    ,icon: 1
+                                    ,yes:function(){
+                                        window.location.reload();
+                                    }
+                                });
+                            }
+                        } else {
+                            if (data.ret == -2) {
+                                layer.alert('注册失败，用户名或邮箱重复且用户名只能为字母数字，请重试。', {
+                                    skin: 'layui-layer-molv'
+                                    ,closeBtn: 0
+                                    ,anim: 1
+                                    ,btn: ['确定']
+                                    ,icon: 2
+                                });
+                            } else if(data.ret == -3){
+                                layer.alert('本站关闭了注册功能。', {
+                                    skin: 'layui-layer-molv'
+                                    ,closeBtn: 0
+                                    ,anim: 1
+                                    ,btn: ['确定']
+                                    ,icon: 2
+                                });
+                            }else if(data.ret == -4){
+                                layer.alert('非法注册，请刷新页面后重新尝试。', {
+                                    skin: 'layui-layer-molv'
+                                    ,closeBtn: 0
+                                    ,anim: 1
+                                    ,btn: ['确定']
+                                    ,icon: 2
+                                });
+                            }else {
+                                layer.alert('注册失败，请重试。', {
+                                    skin: 'layui-layer-molv'
+                                    ,closeBtn: 0
+                                    ,anim: 1
+                                    ,btn: ['确定']
+                                    ,icon: 2
+                                });
+                            }
+                            setTimeout(function () {
+                            }, 2000);
+                        }
+                        again(2);
+                        $("#userzc").css('display','block');
+                        $("#zctishi").css('display','none');
+                    }
+                });
+            }else{
+                shakeModal(6);
+                $("#userzc").css('display','block');
+                $("#zctishi").css('display','none');
+            }
+        }
+
+        function tologin() {
+            var html = ' <p style="display: block;float: right;margin-top: 5px; cursor:pointer;margin-right: 13px;font-size: 24px;" onclick="Closelogin()">×</p>\n' +
+                '                <div class="login-top">\n' +
+                '                    登录\n' +
+                '                </div>\n' +
+                '                <div class="login-center clearfix">\n' +
+                '                    <div class="login-center-input">\n' +
+                '                        <input type="text" id="loginemail" name="" value="" placeholder="请输入您的账号" onfocus="this.placeholder=\'\'" onblur="this.placeholder=\'请输入您的邮箱\'"/>\n' +
+                '                        <div class="login-center-input-text">账号</div>\n' +
+                '                    </div>\n' +
+                '                </div>\n' +
+                '                <div class="login-center clearfix">\n' +
+                '                    <div class="login-center-input">\n' +
+                '                        <input type="password" id="loginpassword" name=""value="" placeholder="请输入您的密码" onfocus="this.placeholder=\'\'" onblur="this.placeholder=\'请输入您的密码\'"/>\n' +
+                '                        <div class="login-center-input-text">密码</div>\n' +
+                '                    </div>\n' +
+                '                </div>\n' +
+                '                <div class="login-center clearfix">\n' +
+                '                    <div style="width: 280px;height: 50px;">\n' +
+                '                        <div id="mpanel1" ondragstart="return false" ></div>\n' +
+                '                    </div>\n' +
+                '                </div>\n' +
+                '                <div class="login-button" onclick="loginAjax()">\n' +
+                '                    登陆\n' +
+                '                </div>'+
+                '                <div><a onclick="retrievepass()" style="margin-top:15px;margin-right: 51px;float: right;font-size: 12px;cursor:pointer;">重置密码</a></div>';
+            $('.login').html(html);
+            $('#zhezhao').show();
+            $('.login').show();
+            $('.login').addClass('animated  slideInDown');
+            $('body').css({
+                "overflow-x":"hidden",
+                "overflow-y":"hidden"
+            });
+            initSlideVerify(1);
+        }
+
+        function Closelogin() {
+            $('#zhezhao').hide();
+            $('.login').hide();
+            $('.registers').hide();
+            $('body').css({
+                "overflow-x":"auto",
+                "overflow-y":"auto"
+            });
+        }
+
+        function loginAjax() {
+            var username = $("#loginemail").val();
+            var pwd = $("#loginpassword").val();
+            if (username == "" || pwd == ""){
+                layer.msg("请填写账号密码！", {icon: 2});
+                return false;
+            }
+            if(verification){
+                //验证成功
+                $.ajax({
+                    type: "POST",
+                    url: "/login",
+                    data: {username: username, password: pwd},
+                    dataType: "json",
+                    success: function (data) {
+                        console.log(data.resultCode);
+                        $('#loginModal').modal('hide');
+                        if (data.resultCode == 200) {
+                            Closelogin();
+                            layer.msg('登录成功', {icon: 1});
+                            setTimeout(function () {
+                                window.location.reload();
+                            }, 1000);
+                        } else {
+                            if (data.resultCode == -1) {
+                                layer.msg('此账号是未激活状态，无法登陆', {icon: 4});
+                                again(1);
+                            } else if(data.resultCode==-2){
+                                layer.msg('您的账号处于冻结状态', {icon: 2});
+                                again(1);
+                            }else if(data.resultCode==-3){
+                                layer.msg('非法登录，请刷新页面重新尝试', {icon: 2});
+                                again(1);
+                            }
+                            else {
+                                layer.msg('登录失败，账号或者密码不正确', {icon: 2});
+                                again(1);
+                            }
+                            setTimeout(function () {
+                                //window.location.reload();
+                            }, 2000);
+                        }
+                    }
+                });
+            }else{
+                //$('#dlts').text('请滑动验证码进行验证，才可登录。');
+                layer.msg('请先进行滑动验证。', {icon: 2});
+            }
+        }
+
+        function initSlideVerify(v) {
+            if(v==1){
+                $('#mpanel1').slideVerify({
+                    type : 1,		//类型
+                    vOffset : 5,	//误差量，根据需求自行调整
+                    barSize : {
+                        width : '100%',
+                        height : '40px',
+                    },
+                    ready : function() {
+                    },
+                    success : function() {
+                        verification = true;
+                    },
+                    error : function() {}
+                });
+            }else{
+                $('#mpanel2').slideVerify({
+                    type : 1,		//类型
+                    vOffset : 5,	//误差量，根据需求自行调整
+                    barSize : {
+                        width : '100%',
+                        height : '40px',
+                    },
+                    ready : function() {
+                    },
+                    success : function() {
+                        zcverification = true;
+                    },
+                    error : function() {}
+                });
+            }
+        }
+
+        function again(v) {
+            if(v==1){
+                logotmp=0;
+                verification = false;
+                $('#mpanel1').html('');
+                $('#mpanel1').slideVerify({
+                    type : 1,		//类型
+                    vOffset : 5,	//误差量，根据需求自行调整
+                    barSize : {
+                        width : '100%',
+                        height : '40px',
+                    },
+                    ready : function() {
+                    },
+                    success : function() {
+                        verification = true;
+                    },
+                    error : function() {}
+                });
+            }
+            if(v==2){
+                zctmp=0;
+                zcverification = false;
+                $('#mpanel2').html('');
+                $('#mpanel2').slideVerify({
+                    type : 1,		//类型
+                    vOffset : 5,	//误差量，根据需求自行调整
+                    barSize : {
+                        width : '100%',
+                        height : '40px',
+                    },
+                    ready : function() {
+                    },
+                    success : function() {
+                        verification = true;
+                    },
+                    error : function() {}
+                });
+            }
+        }
+    </script>
+{{end}}

@@ -1,0 +1,80 @@
+{{template "frame_top"}}
+<div class="container-fluid p-t-15">
+  <div class="row">
+    <div class="col-lg-12">
+      <div class="card">
+        <ul class="nav nav-tabs page-tabs">
+            <li> <a href="/system/site_config">基本</a> </li>
+            <li> <a href="/system/site_upload">上传</a> </li>
+            <li> <a href="/system/site_mail">邮箱配置</a> </li>
+            <li class="active"> <a href="/system/site_examine">图片鉴黄</a> </li>
+        </ul>
+        <div class="tab-content">
+          <div class="tab-pane active">
+              <form name="edit-form" class="edit-form" id="site_examine">
+                  <div class="form-group">
+                      <label for="web_site_title">AppID</label>
+                      <input class="form-control" type="text" id="app_id" name="app_id" value="{{.AppID}}" placeholder="请输入app_id" >
+{{/*                      <small class="help-block">请填写发件时显示的发件人名称</small>*/}}
+                  </div>
+                  <div class="form-group">
+                      <label for="web_site_title">ApiKey</label>
+                      <input class="form-control" type="text" id="api_key" name="api_key" value="{{.ApiKey}}" placeholder="请输入ApiKey" >
+{{/*                      <small class="help-block">请填写邮箱HOST，当前仅支持SMTP。示例：smtpdm.aliyun.com</small>*/}}
+                  </div>
+                  <div class="form-group">
+                      <label for="web_site_keywords">SecretKey</label>
+                      <input class="form-control" type="text" id="secret_key" name="secret_key" value="{{.SecretKey}}" placeholder="请输入SecretKey" >
+{{/*                      <small class="help-block">邮箱服务端口</small>*/}}
+                  </div>
+                  <div class="form-group">
+                      <label class="btn-block" for="web_site_status">图片鉴黄开关</label>
+                      <label class="lyear-switch switch-solid switch-primary">
+                          <input type="checkbox" {{if eq .Status 1}}checked=""{{end}} id="status_form" name="status_form">
+                          <span></span>
+                      </label>
+                      <small class="help-block">关闭后不使用图片审核机制，开启使用百度图片审核。</small>
+                  </div>
+                  <div class="form-group">
+                      <button type="button" class="btn btn-primary m-r-5" onclick="submitForm()">确 定</button>
+                      <button type="button" class="btn btn-default" onclick="javascript:history.back(-1);return false;">返 回</button>
+                  </div>
+              </form>
+          </div>
+        </div>
+
+      </div>
+    </div>
+    
+  </div>
+  
+</div>
+{{template "frame_footer"}}
+<script src="/static/admin/js/bootstrap-notify.min.js"></script>
+<script type="text/javascript" src="/static/admin/js/lightyear.js"></script>
+<script>
+    function submitForm() {
+        lightyear.loading('show');  // 显示
+        $.ajax({
+            //几个参数需要注意一下
+            type: "POST",//方法类型
+            dataType: "json",//预期服务器返回的数据类型
+            url: "/system/site_examine" ,//url
+            data: $('#site_examine').serialize(),
+            success: function (result) {
+                lightyear.loading('hide');  // 隐藏
+                if (result.resultCode == 200) {
+                    lightyear.notify('修改成功~', 'success', 1000, 'mdi mdi-emoticon-happy', 'top', 'center');
+                    setTimeout(function () {location.reload();},1000);
+                }else{
+                    lightyear.notify('异常！'+result.errorMsg, 'warning', 1000, 'mdi mdi-emoticon-happy', 'top', 'center');
+                }
+            },
+            error : function(result) {
+                console.log(result.errorMsg)
+                lightyear.loading('hide');  // 隐藏
+                lightyear.notify('异常！' + result.errorMsg, 'warning', 1000, 'mdi mdi-emoticon-happy', 'top', 'center');
+            }
+        });
+    }
+</script>

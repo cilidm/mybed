@@ -1,0 +1,146 @@
+<!DOCTYPE html>
+<html>
+<head>
+    <meta charset="utf-8">
+    <title>Layui</title>
+    <meta name="renderer" content="webkit">
+    <meta http-equiv="X-UA-Compatible" content="IE=edge,chrome=1">
+    <meta name="viewport" content="width=device-width, initial-scale=1, maximum-scale=1">
+    <link rel="stylesheet" href="/static/home/layui/layui/css/layui.css"  media="all">
+    {{template "layui_frame_css"}}
+</head>
+<body>
+
+<table class="layui-hide" id="test" lay-filter="test"></table>
+<script type="text/html" id="toolbarDemo">
+    <div class="layui-btn-container">
+        <button class="layui-btn layui-btn-sm btn-primary" lay-event="getCheckData">删除选中用户</button>
+    </div>
+</script>
+
+<script type="text/html" id="barDemo">
+{{/*    <a class="copyLink layui-btn btn-primary layui-btn-xs" lay-event="edit" ><i class="layui-icon" onmouseover="layer.tips('点击复制图片链接', this, {tips: [3, '#000']});">&#xe64c;</i></a>*/}}
+{{/*    <a class="layui-btn btn-success layui-btn-xs" lay-event="show"><i class="layui-icon"  onmouseover="layer.tips('点击查看图片', this, {tips: [3, '#000']});">&#xe64a;</i></a>*/}}
+{{/*    <a class="layui-btn btn-warning layui-btn-xs" lay-event="show_qrcode"><i class="layui-icon"  onmouseover="layer.tips('点击查看图片二维码', this, {tips: [3, '#000']});">&#xe610;</i></a>*/}}
+    <a class="layui-btn btn-danger layui-btn-xs" lay-event="del"><i class="layui-icon">&#xe640;</i> 删除</a>
+</script>
+
+<script src="/static/home/layui/layui/layui.js" charset="utf-8"></script>
+<!-- 注意：如果你直接复制所有代码到本地，上述js路径需要改成你本地的 -->
+<script>
+    layui.use(['jquery','table','element'], function(){
+        var table = layui.table,form = layui.form,
+            $ = layui.$,element = layui.element;
+
+        table.render({
+            elem: '#test'
+            ,url:'/system/user_list_json'
+            ,toolbar: '#toolbarDemo' //开启头部工具栏，并为其绑定左侧模板
+            ,defaultToolbar: ['filter', 'exports', 'print', { //自定义头部工具栏右侧图标。如无需自定义，去除该参数即可
+                title: '提示'
+                ,layEvent: 'LAYTABLE_TIPS'
+                ,icon: 'layui-icon-tips'
+            }]
+            ,title: '用户数据表'
+            ,cols: [[
+                {type: 'checkbox', fixed: 'left'}
+                ,{field:'Id', title:'ID', width:80, fixed: 'left', unresize: true, sort: true}
+                ,{field:'Username', title:'用户名',  edit: 'text'}
+                ,{field:'Email', title:'邮箱',  edit: 'text'}
+                ,{field:'Status', title:'状态',width: 100,templet:function (res) {
+                    if(res.Level == '99'){return ''}else{
+                        if (res.Status == "1"){return '<input type="checkbox" id="'+res.Id+'" name="status" value="'+res.Status+'" lay-skin="switch" lay-text="启用|停用" lay-filter="sexDemo" checked }}>'}
+                        if (res.Status == "2"){return '<input type="checkbox" id="'+res.Id+'" name="status" value="'+res.Status+'" lay-skin="switch" lay-text="启用|停用" lay-filter="sexDemo" }}>'}
+                    }
+                }}
+                ,{field:'MemoryUsed', title:'空间使用率',width: 100,templet:function (res) {
+                    var color = 'layui-bg-blue';
+                    if(res.MemoryUsed >= 80){color='layui-bg-red';}
+                    if(30 >res.MemoryUsed < 80){color='layui-bg-orange';}
+                    return '<div class="layui-progress" style="margin-top: 17px;" lay-showpercent="true">\n' +
+                        '  <div class="layui-progress-bar '+color+'" lay-percent="'+res.MemoryUsed+'%"></div>\n' +
+                        '</div>'
+                    }}
+                ,{field:'CreatedAt', title:'注册日期',  edit: 'text', sort: true}
+                ,{field:'LastLoginTime', title:'最后登陆时间'}
+                ,{fixed: 'right', title:'操作', toolbar: '#barDemo', width:100}
+            ]]
+            ,page: true
+            ,done:function (res,currentCount) {
+                element.render();
+            }
+        });
+        //监听状态操作
+        form.on('switch(sexDemo)', function(obj){
+            var status;
+            if(obj.elem.checked == false){
+                status = 2;
+            }else{
+                status = 1;
+            }
+            $.post("/system/user_change_status",{"uid":this.id,"status":status},function (res) {
+                if (res.resultCode == 200){layer.msg(res.msg);}else{layer.msg(res.errorMsg);}
+                setTimeout(function () {location.reload();},1000);
+            })
+        });
+        //监听行工具事件
+        table.on('tool(test)', function(obj){
+            var data = obj.data;
+            //console.log(obj)
+            if(obj.event === 'del'){
+                layer.confirm('真的删除该用户吗？', function(index){
+                    $.post("/system/del_user",{"id":data.Id},function (res) {
+                        if (res.resultCode == 200){
+                            layer.msg("删除成功");
+                            setTimeout(function () {
+                                location.reload();
+                            },1000)
+                        }else{
+                            layer.msg(res.errorMsg);
+                        }
+                    })
+                    layer.close(index);
+                });
+            } else if(obj.event === 'copy'){
+                var copy = new ClipboardJS('.copybtn', {
+                    text: function (trigger) {
+                        return  data.ImgUrl;
+                    }
+                });
+                copy.on('success', function (e) {
+                    layer.msg("复制成功")
+                    copy.off("success");
+                });
+                copy.on('error', function (e) {
+                    layer.msg("复制失败")
+                    copy.off("error");
+                });
+            }else if(obj.event === 'show'){
+                layer.open({
+                    type: 1,
+                    title: "",
+                    skin: 'layui-layer-demo', //样式类名
+                    closeBtn: 0, //不显示关闭按钮
+                    anim: 2,
+                    area: ['420px','420px'], //宽高
+                    shadeClose: true, //开启遮罩关闭
+                    content: "<img src='"+data.ImgUrl+"' width='100%'>"
+                });
+            }else if(obj.event === "show_qrcode"){
+                layer.open({
+                    type: 1,
+                    title: "",
+                    skin: 'layui-layer-demo', //样式类名
+                    closeBtn: 0, //不显示关闭按钮
+                    anim: 2,
+                    area: ['300px','300px'], //宽高
+                    shadeClose: true, //开启遮罩关闭
+                    content: "<img src='{{.conf.WebUrl}}system/qrcode?url="+data.ImgUrl+"' width='100%'>"
+                });
+            }
+        });
+    });
+</script>
+
+</body>
+</html>

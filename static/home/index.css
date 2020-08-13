@@ -1,0 +1,10 @@
+a{text-decoration:none}
+a:hover{text-decoration:none}
+.layui-layout-admin .layui-logo{color:#fff}
+.layui-layout-admin .layui-footer{left:0;text-align:center}
+.layui-upload-choose{display:none}
+#multiple{width:100%;-moz-box-sizing:border-box;-o-box-sizing:border-box;-ms-box-sizing:border-box;box-sizing:border-box}
+#uploadDemoView{margin-top:10px;padding-top:10px;border-top:1px solid #eee}
+.uploadBox{padding:0 30px;width:80%;margin:0 auto;margin-bottom:44px}
+.layui-table{text-align:center}
+.layui-tab-title{text-align:center}

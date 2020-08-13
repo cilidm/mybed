@@ -1,0 +1,11 @@
+{{define "frame_store_config_menu"}}
+    <ul class="nav nav-tabs page-tabs">
+        <li {{if eq .activeMenu "oss"}} class="active"{{end}}> <a href="/system/store_config_oss">阿里OSS</a> </li>
+        <li {{if eq .activeMenu "cos"}} class="active"{{end}}> <a href="/system/store_config_cos">腾讯COS</a> </li>
+        <li {{if eq .activeMenu "minio"}} class="active"{{end}}> <a href="/system/store_config_minio">Minio</a> </li>
+        <li {{if eq .activeMenu "bos"}} class="active"{{end}}> <a href="/system/store_config_bos">百度云BOS</a> </li>
+        <li {{if eq .activeMenu "obs"}} class="active"{{end}}> <a href="/system/store_config_obs">华为云OBS</a> </li>
+        <li {{if eq .activeMenu "qiniu"}} class="active"{{end}}> <a href="/system/store_config_qiniu">七牛云</a> </li>
+        <li {{if eq .activeMenu "upyun"}} class="active"{{end}}> <a href="/system/store_config_upyun">又拍云UpYun</a> </li>
+    </ul>
+{{end}}

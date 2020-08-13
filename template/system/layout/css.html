@@ -1,0 +1,21 @@
+{{define "css"}}
+    <head>
+        <meta charset="utf-8">
+        <meta name="viewport" content="width=device-width, initial-scale=1, maximum-scale=1, user-scalable=no" />
+        <title> {{.config.WebName}}</title>
+        <link rel="icon" href="/static/favicon.ico" type="image/ico">
+        <meta name="keywords" content="{{.config.KeyWord}}">
+        <meta name="description" content="{{.config.SiteDescription}}">
+        <link href="/static/admin/css/bootstrap.min.css" rel="stylesheet">
+        <link href="/static/admin/css/materialdesignicons.min.css" rel="stylesheet">
+        <link rel="stylesheet" href="/static/admin/js/bootstrap-multitabs/multitabs.min.css">
+        <link href="/static/admin/css/style.min.css" rel="stylesheet">
+        <style>
+            #logo a{color:#4d5259;white-space:nowrap;font-size:22px;line-height:68px;}
+            [data-logobg*=color_] #logo a{color:#fff;}
+            @media (min-width:1024px){.lyear-layout-sidebar.lyear-aside-open #logo a{display:block;overflow:hidden;margin:0 auto;width:45px;height:68px;text-align:center;letter-spacing:3px;}
+                .lyear-layout-sidebar-close .lyear-layout-sidebar:hover #logo a{margin:0;width:100%;letter-spacing:0;}
+            }
+        </style>
+    </head>
+{{end}}

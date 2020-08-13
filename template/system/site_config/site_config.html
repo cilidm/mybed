@@ -1,0 +1,111 @@
+{{template "frame_top"}}
+<link href="/static/admin/css/animate.css" rel="stylesheet">
+<link href="/static/admin/css/cropper.min.css" rel="stylesheet">
+<div class="container-fluid p-t-15">
+  <div class="row">
+    <div class="col-lg-12">
+      <div class="card">
+        <ul class="nav nav-tabs page-tabs">
+          <li class="active"> <a href="/system/site_config">基本</a> </li>
+          <li> <a href="/system/site_upload">上传</a> </li>
+          <li> <a href="/system/site_mail">邮箱配置</a> </li>
+          <li> <a href="/system/site_examine">图片鉴黄</a> </li>
+        </ul>
+        <div class="tab-content">
+          <div class="tab-pane active">
+
+            <form name="edit-form" class="edit-form" id="site_config">
+              <div class="form-group">
+                <label for="web_site_title">网站标题</label>
+                <input class="form-control" type="text" id="web_name" name="web_name" value="{{.WebName}}" placeholder="请输入站点标题" >
+              </div>
+              <div class="form-group">
+                <label for="web_site_title">网站网址</label>
+                <input class="form-control" type="text" id="web_url" name="web_url" value="{{.WebUrl}}" placeholder="请输入网站网址 http://www.xxx.com/" >
+              </div>
+              <div class="form-group">
+                <label for="pic_url">LOGO图片</label>
+                <div class="input-group">
+                  <input type="text" class="form-control image-src" name="logo_img" placeholder="需先配置存储源" value="{{.LogoImg}}" />
+                  <div class="input-group-btn">
+                    <button class="btn btn-default trigger-btn" type="button">上传图片</button>
+                  </div>
+                </div>
+              </div>
+              <div class="form-group">
+                <label for="web_site_keywords">站点关键词</label>
+                <input class="form-control" type="text" id="key_word" name="key_word" value="{{.KeyWord}}" placeholder="请输入站点关键词" >
+                <small class="help-block">网站搜索引擎关键字</small>
+              </div>
+              <div class="form-group">
+                <label for="web_site_description">站点描述</label>
+                <textarea class="form-control" id="site_description" rows="5" name="site_description" placeholder="请输入站点描述" >{{.SiteDescription}}</textarea>
+                <small class="help-block">网站描述，有利于搜索引擎抓取相关信息</small>
+              </div>
+              <div class="form-group">
+                <label for="web_site_copyright">版权信息</label>
+                <input class="form-control" type="text" id="copyright" name="copyright" value="{{.Copyright}}" placeholder="请输入版权信息" >
+              </div>
+              <div class="form-group">
+                <label for="web_site_icp">备案信息</label>
+                <input class="form-control" type="text" id="record_info" name="record_info" value="{{.RecordInfo}}" placeholder="请输入备案信息" >
+              </div>
+              <div class="form-group">
+                <label class="btn-block" for="web_site_status">站点开关</label>
+                <label class="lyear-switch switch-solid switch-primary">
+                  <input type="checkbox" id="site_status" name="site_status" {{if eq .SiteStatus 1}}checked=""{{end}}>
+                  <span></span>
+                </label>
+                <small class="help-block">站点关闭后将不能访问，后台可正常登录</small>
+              </div>
+              <input type="hidden" name="form_type" value="1">
+              <div class="form-group">
+                <button type="button" class="btn btn-primary m-r-5" onclick="submitForm()">确 定</button>
+                <button type="button" class="btn btn-default" onclick="javascript:history.back(-1);return false;">返 回</button>
+              </div>
+            </form>
+
+          </div>
+        </div>
+
+      </div>
+    </div>
+  </div>
+</div>
+<!--图片裁剪START-->
+{{template "crop_image"}}
+<!--图片裁剪END-->
+{{template "frame_footer"}}
+<script type="text/javascript" src="/static/admin/js/perfect-scrollbar.min.js"></script>
+<script src="/static/admin/js/bootstrap-notify.min.js"></script>
+<script type="text/javascript" src="/static/admin/js/lightyear.js"></script>
+{{template "crop_image_js"}}
+<script>
+  //=============================================
+  function submitForm() {
+    lightyear.loading('show');  // 显示
+    $.ajax({
+      //几个参数需要注意一下
+      type: "POST",//方法类型
+      dataType: "json",//预期服务器返回的数据类型
+      url: "/system/site_config" ,//url
+      data: $('#site_config').serialize(),
+      success: function (result) {
+        lightyear.loading('hide');  // 隐藏
+        if (result.resultCode == 200) {
+          lightyear.notify('修改成功~', 'success', 1000, 'mdi mdi-emoticon-happy', 'top', 'center');
+          setTimeout(function () {
+            location.reload();
+          },1000)
+        }else{
+          lightyear.notify('异常！'+result.errorMsg, 'warning', 1000, 'mdi mdi-emoticon-happy', 'top', 'center');
+        }
+      },
+      error : function(result) {
+        console.log(result.errorMsg)
+        lightyear.loading('hide');  // 隐藏
+        lightyear.notify('异常！' + result.errorMsg, 'warning', 1000, 'mdi mdi-emoticon-happy', 'top', 'center');
+      }
+    });
+  }
+</script>

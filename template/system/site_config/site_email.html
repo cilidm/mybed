@@ -1,0 +1,122 @@
+{{template "frame_top"}}
+<div class="container-fluid p-t-15">
+  <div class="row">
+    <div class="col-lg-12">
+      <div class="card">
+        <ul class="nav nav-tabs page-tabs">
+            <li> <a href="/system/site_config">基本</a> </li>
+            <li> <a href="/system/site_upload">上传</a> </li>
+            <li class="active"> <a href="/system/site_mail">邮箱配置</a> </li>
+            <li> <a href="/system/site_examine">图片鉴黄</a> </li>
+        </ul>
+        <div class="tab-content">
+          <div class="tab-pane active">
+              <form name="edit-form" class="edit-form" id="site_config">
+                  <div class="form-group">
+                      <label for="web_site_title">发件人昵称</label>
+                      <input class="form-control" type="text" id="email_name" name="email_name" value="{{.EmailName}}" placeholder="请输入发件人昵称" >
+                      <small class="help-block">请填写发件时显示的发件人名称</small>
+                  </div>
+                  <div class="form-group">
+                      <label for="web_site_title">主机地址</label>
+                      <input class="form-control" type="text" id="email_host" name="email_host" value="{{.EmailHost}}" placeholder="请输入主机地址" >
+                      <small class="help-block">请填写邮箱HOST，当前仅支持SMTP。示例：smtpdm.aliyun.com</small>
+                  </div>
+                  <div class="form-group">
+                      <label for="web_site_keywords">端口</label>
+                      <input class="form-control" type="text" id="email_port" name="email_port" value="{{.EmailPort}}" placeholder="请输入端口" >
+                      <small class="help-block">邮箱服务端口</small>
+                  </div>
+                  <div class="form-group">
+                      <label for="web_site_description">邮箱地址</label>
+                      <input class="form-control" type="text" id="email_user" name="email_user" value="{{.EmailUser}}" placeholder="请输入邮箱地址" >
+                      <small class="help-block">邮箱地址</small>
+                  </div>
+                  <div class="form-group">
+                      <label for="web_site_copyright">授权码</label>
+                      <input class="form-control" type="text" id="email_pwd" name="email_pwd" value="{{.EmailPwd}}" placeholder="请输入授权码" >
+                      <small class="help-block">注：此处不是填写邮箱密码</small>
+                  </div>
+                  <div class="form-group">
+                      <label for="web_site_icp">测试地址</label>
+                      <input class="form-control" type="text" id="email_test" name="email_test" value="{{.EmailTest}}" placeholder="请输入测试邮箱地址" >
+                      <small class="help-block">在测试邮箱配置是否成功的时候，接收测试邮件的邮箱地址</small>
+                  </div>
+                  <div class="form-group">
+                      <label for="web_site_description">注册邮件模板</label>
+                      <textarea class="form-control" id="email_template" rows="5" name="email_template" placeholder="请输入模板内容" >{{.EmailTemplate}}</textarea>
+                  </div>
+                  <div class="form-group">
+                      <label class="btn-block" for="web_site_status">邮件开关</label>
+                      <label class="lyear-switch switch-solid switch-primary">
+                          <input type="checkbox" {{if eq .EmailStatus 1}}checked=""{{end}} id="email_status" name="email_status">
+                          <span></span>
+                      </label>
+                      <small class="help-block">关闭后不使用邮件功能，开启后修改配置时会先发送测试邮件验证配置。</small>
+                  </div>
+                  <div class="form-group">
+                      <button type="button" class="btn btn-primary m-r-5" onclick="submitForm()">确 定</button>
+                      <button type="button" class="btn btn-default" onclick="javascript:history.back(-1);return false;">返 回</button>
+                  </div>
+              </form>
+          </div>
+        </div>
+
+      </div>
+    </div>
+    
+  </div>
+  
+</div>
+{{template "frame_footer"}}
+<script src="/static/admin/js/bootstrap-notify.min.js"></script>
+<script type="text/javascript" src="/static/admin/js/lightyear.js"></script>
+<script>
+    function submitForm() {
+        lightyear.loading('show');  // 显示
+        var testMail = $('#email_status').prop("checked");
+        if (testMail == true){
+            $.ajax({
+                //几个参数需要注意一下
+                type: "POST",//方法类型
+                dataType: "json",//预期服务器返回的数据类型
+                url: "/system/site_test_mail" ,//url
+                data: $('#site_config').serialize(),
+                success: function (result) {
+                    if(result.resultCode == 200){
+                        sendChange();
+                    }else {
+                        lightyear.loading('hide');  // 隐藏
+                        lightyear.notify('测试邮件发送失败，请检查邮箱配置！', 'warning', 1500, 'mdi mdi-emoticon-happy', 'top', 'center');
+                        // setTimeout(function () {location.reload();},1500);
+                    }
+                }
+            });
+        }else {
+            sendChange();
+        }
+    }
+    function sendChange() {
+        $.ajax({
+            //几个参数需要注意一下
+            type: "POST",//方法类型
+            dataType: "json",//预期服务器返回的数据类型
+            url: "/system/site_mail" ,//url
+            data: $('#site_config').serialize(),
+            success: function (result) {
+                lightyear.loading('hide');  // 隐藏
+                if (result.resultCode == 200) {
+                    lightyear.notify('修改成功~', 'success', 1000, 'mdi mdi-emoticon-happy', 'top', 'center');
+                    setTimeout(function () {location.reload();},1000);
+                }else{
+                    lightyear.notify('异常！'+result.errorMsg, 'warning', 1000, 'mdi mdi-emoticon-happy', 'top', 'center');
+                }
+            },
+            error : function(result) {
+                console.log(result.errorMsg)
+                lightyear.loading('hide');  // 隐藏
+                lightyear.notify('异常！' + result.errorMsg, 'warning', 1000, 'mdi mdi-emoticon-happy', 'top', 'center');
+            }
+        });
+    }
+</script>

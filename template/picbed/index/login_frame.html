@@ -1,0 +1,13 @@
+{{define "login_frame"}}
+    <link rel="stylesheet" type="text/css" href="/static/home/verify/verify.css">
+    <style>
+        .login{z-index:2;position:absolute;width:350px;border-radius:5px;height:500px;background:#fff;box-shadow:0 0 5px #333;top:50%;left:50%;margin-top:-250px;margin-left:-175px;transition:all 1s;-moz-transition:all 1s;-webkit-transition:all 1s;-o-transition:all 1s}
+        .login-top{font-size:24px;margin-top:100px;padding-left:40px;box-sizing:border-box;color:#333;margin-bottom:50px}
+        .login-center{width:100%;box-sizing:border-box;padding:0 40px;margin-bottom:30px}
+        .login-button{cursor:pointer;width:250px;text-align:center;height:40px;line-height:40px;background-color:#1e90ff;border-radius:5px;margin:0 auto;margin-top:50px;color:#fff}
+        .login-center-input{float:left;width:265px;margin-left:0;height:30px;position:relative}
+        .login-center-input input{z-index:2;transition:all .5s;padding-left:10px;color:#333;width:105%;height:30px;border:0;border-bottom:1px solid #ccc;border-top:1px solid #fff;border-left:1px solid #fff;border-right:1px solid #fff;box-sizing:border-box;outline:0;position:relative}
+        .login-center-input-text{background:#fff;padding:0 5px;position:absolute;z-index:0;opacity:0;height:20px;top:50%;margin-top:-10px;font-size:14px;left:5px;color:#1e90ff;line-height:20px;transition:all .5s;-moz-transition:all .5s;-webkit-transition:all .5s;-o-transition:all .5s}
+    </style>
+    <div class="login" style="z-index: 9999;display: none;position: fixed;"></div>
+{{end}}

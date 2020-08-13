@@ -1,0 +1,87 @@
+{{template "frame_top"}}
+<div class="container-fluid p-t-15">
+
+    <div class="row">
+        <div class="col-lg-12">
+            <div class="card">
+                {{template "frame_store_config_menu" .}}
+                <div class="tab-content">
+                    <div class="tab-pane active">
+                        <form id="store_form" name="edit-form" class="edit-form">
+                            <div class="form-group">
+                                <label>AccessKetID</label>
+                                <input class="form-control" type="text" id="access_key" name="access_key" value="{{.store.AccessKey}}" placeholder="" >
+                            </div>
+                            <div class="form-group">
+                                <label>SecretAccessKey</label>
+                                <input class="form-control" type="text" id="secret_key" name="secret_key" value="{{.store.SecretKey}}" placeholder="" >
+                            </div>
+                            <div class="form-group">
+                                <label>Endpoint</label>
+                                <input class="form-control" type="text" id="endpoint" name="endpoint" value="{{.store.Endpoint}}" placeholder="endpoint不需要加http://前缀,只填写域名+端口号即可" >
+                            </div>
+                            <div class="form-group">
+                                <label>存储桶名称</label>
+                                <input class="form-control" type="text" id="public_bucket" name="public_bucket" value="{{.store.PublicBucket}}" placeholder="" >
+                            </div>
+                            <div class="form-group">
+                                <label>请求域名</label>
+                                <input class="form-control" type="text" id="public_bucket_domain" name="public_bucket_domain" value="{{.store.PublicBucketDomain}}" placeholder="生成图片url的域名，需带有http://或https://" >
+                            </div>
+                            <input type="hidden" name="config_type" value="cs-oss">
+                            <div class="form-group">
+                                <label class="btn-block" for="web_site_status">使用此配置</label>
+                                <label class="lyear-switch switch-solid switch-primary">
+                                    {{if eq .store.Status 1}}
+                                        <input type="checkbox" name="status" checked="">
+                                    {{else}}
+                                        <input type="checkbox" name="status">
+                                    {{end}}
+                                    <span></span>
+                                </label>
+                            </div>
+                            <div class="form-group">
+                                <button type="button" class="btn btn-primary m-r-5" onclick="submitForm();">确 定</button>
+                                <button type="button" class="btn btn-default" onclick="javascript:history.back(-1);return false;">返 回</button>
+                            </div>
+                        </form>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+{{template "frame_js"}}
+<script src="/static/admin/js/bootstrap-notify.min.js"></script>
+<script type="text/javascript" src="/static/admin/js/lightyear.js"></script>
+<script>
+    function submitForm() {
+        lightyear.loading('show');  // 显示
+        $.ajax({
+            //几个参数需要注意一下
+            type: "POST",//方法类型
+            dataType: "json",//预期服务器返回的数据类型
+            url: "/system/store_config" ,//url
+            data: $('#store_form').serialize(),
+            success: function (result) {
+                lightyear.loading('hide');  // 隐藏
+                console.log(result);//打印服务端返回的数据(调试用)
+                if (result.resultCode == 200) {
+                    lightyear.notify('配置保存成功~', 'success', 1000, 'mdi mdi-emoticon-happy', 'top', 'center');
+                    setTimeout(function () {
+                        location.reload();
+                    },1000)
+                }else{
+                    lightyear.notify('异常！'+result.errorMsg, 'warning', 1000, 'mdi mdi-emoticon-happy', 'top', 'center');
+                }
+            },
+            error : function(result) {
+                console.log(result.errorMsg)
+                lightyear.loading('hide');  // 隐藏
+                lightyear.notify('异常！' + result.errorMsg, 'warning', 1000, 'mdi mdi-emoticon-happy', 'top', 'center');
+            }
+        });
+    }
+</script>
+</body>
+</html>

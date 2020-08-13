@@ -1,0 +1,66 @@
+{{template "frame_top"}}
+<div class="container-fluid p-t-15">
+  
+  <div class="row">
+    <div class="col-lg-12">
+      <div class="card">
+        <div class="card-body">
+          
+          <form id="edit_pwd_form" class="site-form">
+            <div class="form-group">
+              <label for="old-password">旧密码</label>
+              <input type="password" class="form-control" name="oldpwd" id="old-password" placeholder="输入账号的原登录密码">
+            </div>
+            <div class="form-group">
+              <label for="new-password">新密码</label>
+              <input type="password" class="form-control" name="newpwd" id="new-password" placeholder="输入新的密码">
+            </div>
+            <div class="form-group">
+              <label for="confirm-password">确认新密码</label>
+              <input type="password" class="form-control" name="confirmpwd" id="confirm-password" placeholder="请输入正确的邮箱地址">
+            </div>
+            <button type="button" class="btn btn-primary" onclick="submitForm()">提交</button>
+          </form>
+ 
+        </div>
+      </div>
+    </div>
+    
+  </div>
+  
+</div>
+{{template "frame_footer"}}
+<script src="/static/admin/js/bootstrap-notify.min.js"></script>
+<script type="text/javascript" src="/static/admin/js/lightyear.js"></script>
+<script>
+  function submitForm() {
+    lightyear.loading('show');  // 显示
+    $.ajax({
+      //几个参数需要注意一下
+      type: "POST",//方法类型
+      dataType: "json",//预期服务器返回的数据类型
+      url: "/system/edit_pwd" ,//url
+      data: $('#edit_pwd_form').serialize(),
+      success: function (result) {
+        lightyear.loading('hide');  // 隐藏
+        console.log(result);//打印服务端返回的数据(调试用)
+        if (result.resultCode == 200) {
+          lightyear.notify('修改成功，请重新登陆~', 'success', 1000, 'mdi mdi-emoticon-happy', 'top', 'center');
+          setTimeout(function () {
+            window.parent.location.href= "/";
+          },1000)
+        }else{
+          lightyear.notify('异常！'+result.errorMsg, 'warning', 1000, 'mdi mdi-emoticon-happy', 'top', 'center');
+        }
+      },
+      error : function(result) {
+        console.log(result.errorMsg)
+        lightyear.loading('hide');  // 隐藏
+        lightyear.notify('异常！' + result.errorMsg, 'warning', 1000, 'mdi mdi-emoticon-happy', 'top', 'center');
+        setTimeout(function () {
+          location.reload();
+        },1000)
+      }
+    });
+  }
+</script>

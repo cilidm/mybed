@@ -1,0 +1,129 @@
+<!DOCTYPE html>
+<html>
+<head>
+    <meta charset="utf-8">
+    <meta name="keywords" content="{{.Config.KeyWord}}" />
+    <meta name="description" content="{{.Config.SiteDescription}}" />
+    <meta name="viewport" content="width=device-width, initial-scale=1, maximum-scale=1">
+    <title>{{.Config.WebName}}</title>
+    <link rel="stylesheet" href="/static/home/layui/layui/css/layui.css">
+    <style>
+        a{text-decoration:none}
+        a:hover{text-decoration:none}
+        .layui-layout-admin .layui-logo{color:#fff}
+        .layui-layout-admin .layui-footer{left:0;text-align:center}
+        .layui-upload-choose{display:none}
+        #multiple{width:100%;-moz-box-sizing:border-box;-o-box-sizing:border-box;-ms-box-sizing:border-box;box-sizing:border-box}
+        #uploadDemoView{margin-top:10px;padding-top:10px;border-top:1px solid #eee}
+        .uploadBox{padding:0 30px;width:80%;margin:0 auto;margin-bottom:44px}
+        .layui-table{text-align:center}
+        .layui-tab-title{text-align:center}
+    </style>
+</head>
+<body>
+<div class="layui-layout layui-layout-admin">
+    {{template "index_header" .}}
+    <div class="uploadBox">
+        <fieldset class="layui-elem-field layui-field-title" style="margin-top: 30px;">
+            <legend>单文件上传</legend>
+        </fieldset>
+        {{if eq .Upload.AllowUpload 1}}
+            <div class="layui-upload-drag" id="multiple">
+                <i class="layui-icon"></i>
+                <p>点击上传，或将文件拖拽到此处</p>
+                <div class="layui-hide" id="uploadDemoView"></div>
+            </div>
+        {{else}}
+            <h1 style="text-align: center;color: #dddddd">管理员已禁止游客上传，请登陆</h1>
+        {{end}}
+{{/*        <div style="margin-bottom: 15px">*/}}
+{{/*            <button type="button" class="layui-btn" id="test9" style="margin-top: 15px;float: right">开始上传</button>*/}}
+{{/*        </div>*/}}
+        <div class="successAppend layui-hide">
+            <div class="layui-tab layui-tab-brief" lay-filter="docDemoTabBrief">
+                <ul class="layui-tab-title">
+                    <li class="layui-this">URL</li>
+                    <li>HTML</li>
+                    <li>Markdown</li>
+                    <li>BBCode</li>
+                </ul>
+                <div class="layui-tab-content">
+                    <div class="layui-tab-item layui-show">
+                        <table class="layui-table" lay-even="" lay-skin="nob">
+                            <tbody id="url_table"></tbody>
+                        </table>
+                    </div>
+                    <div class="layui-tab-item">
+                        <table class="layui-table" lay-even="" lay-skin="nob">
+                            <tbody id="html_table"></tbody>
+                        </table>
+                    </div>
+                    <div class="layui-tab-item">
+                        <table class="layui-table" lay-even="" lay-skin="nob">
+                            <tbody id="markdown_table"></tbody>
+                        </table>
+                    </div>
+                    <div class="layui-tab-item">
+                        <table class="layui-table" lay-even="" lay-skin="nob">
+                            <tbody id="bbcode_table"></tbody>
+                        </table>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+    <div class="layui-footer">
+        <!-- 底部固定区域 -->
+        © {{.Config.Copyright}}
+    </div>
+</div>
+<script src="/static/home/layui/layui/layui.js"></script>
+<script src="/static/home/clipboard.min.js"></script>
+<script>
+    layui.use(['element','upload'],function(){
+        var $ = layui.jquery ,element = layui.element,upload = layui.upload;
+        //拖拽上传
+        upload.render({
+            elem: '#multiple'
+            ,auto: true
+            ,multiple: false
+            ,accept: 'image' //普通文件
+            ,exts: '{{.Upload.AllowImgUploadExt}}'
+            ,size: {{.Upload.FileSize}} //限制文件大小，单位 KB
+            ,url: '/uploads' //改成您自己的上传接口
+            // ,bindAction: '#test9'
+            ,done: function(res){
+                layer.msg('上传成功');
+                $.each(res.data,function (i,item) {
+                    layui.$('.successAppend').removeClass('layui-hide');
+                    layui.$('#uploadDemoView').removeClass('layui-hide');
+                    $('#uploadDemoView').append(' <img src="'+item.imgurls+'" alt="'+item.imgnames+'" style="max-width: 120px;margin: 5px;">')
+                    $('#url_table').append('<tr><td>URL</td><td>'+item.imgurls+'</td><td style="width: 80px;"><button class="layui-btn copybtn"  data-clipboard-text="'+item.imgurls+'">复制</button></td></tr>')
+                    var htmlStr = '&lt;img src="' + item.imgurls + '"/&gt;'
+                    $('#html_table').append('<tr><td>HTML</td><td>'+htmlStr+'</td><td style="width: 80px;"><button class="layui-btn copybtn" data-clipboard-target="#htmlcode">复制</button></td></tr>')
+                    $('#html_table').append("<input class='layui-hide' id='htmlcode' value='"+htmlStr+"' />")
+                    $('#markdown_table').append('<tr><td>Markdown</td><td>![]('+item.imgurls+')</td><td style="width: 80px;"><button class="layui-btn copybtn" data-clipboard-text="![]('+item.imgurls+')">复制</button></td></tr>')
+                    $('#bbcode_table').append('<tr><td>BBCode</td><td>[img]'+item.imgurls+'[/img]</td><td style="width: 80px;"><button class="layui-btn copybtn" data-clipboard-text="[img]'+item.imgurls+'[/img]">复制</button></td></tr>')
+                })
+            }
+        });
+    });
+    var clipboard = new ClipboardJS('.copybtn');
+    clipboard.on('success', function(e) {
+        layer.msg("复制成功")
+    });
+    clipboard.on('error', function(e) {
+        layer.msg("复制失败")
+    });
+
+    //json的length
+    function getJsonLength(jsonData){
+        var jsonLength = 0;
+        for(var item in jsonData){
+            jsonLength++;
+        }
+        return jsonLength;
+    }
+</script>
+</body>
+</html>

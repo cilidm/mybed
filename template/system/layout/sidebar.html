@@ -1,0 +1,59 @@
+{{define "sidebar"}}
+    <aside class="lyear-layout-sidebar">
+        <!-- logo -->
+        <div id="logo" class="sidebar-header">
+            <a href="/">{{.config.WebName}}</a>
+        </div>
+        <div class="lyear-layout-sidebar-scroll">
+            <nav class="sidebar-main">
+                <ul class="nav nav-drawer">
+                    <li class="nav-item active"> <a class="multitabs" href="/system/frame_index"><i class="mdi mdi-home"></i> <span>后台首页</span></a> </li>
+                    <li class="nav-item nav-item-has-subnav">
+                        <a href="javascript:void(0)"><i class="mdi mdi-human-greeting"></i> 个人中心</a>
+                        <ul class="nav nav-subnav">
+                            <li> <a class="multitabs" href="/system/img_list"><i class="mdi mdi-panorama"></i> 图片列表</a> </li>
+                            <li> <a class="multitabs"  href="/system/img_show"><i class="mdi mdi-houzz-box"></i> 我的画廊</a> </li>
+                            <li> <a class="multitabs"  href="/system/pages_gallery"><i class="mdi mdi-folder-multiple-image"></i> 图片展示</a> </li>
+                            <li> <a class="multitabs"  href="/system/edit_pwd"><i class="mdi mdi-key-variant"></i> 修改密码</a> </li>
+                        </ul>
+                    </li>
+                    {{if .isAdmin}}
+                    <li class="nav-item nav-item-has-subnav">
+                        <a href="javascript:void(0)"><i class="mdi mdi-human-male-female"></i> 用户管理</a>
+                        <ul class="nav nav-subnav">
+                            <li> <a class="multitabs"  href="/system/user_list">用户列表</a> </li>
+{{/*                            <li> <a class="multitabs"  href="lyear_ui_cards.html">分发群组</a> </li>*/}}
+                            <li> <a class="multitabs"  href="lyear_ui_grid.html">扩容码</a> </li>
+                        </ul>
+                    </li>
+                    <li class="nav-item nav-item-has-subnav">
+                        <a href="javascript:void(0)"><i class="mdi mdi-settings"></i> 系统设置</a>
+                        <ul class="nav nav-subnav">
+                            <li> <a class="multitabs" href="/system/store_config_oss">云存储配置</a> </li>
+                            <li> <a  class="multitabs" href="/system/site_config">站点配置</a> </li>
+                        </ul>
+                    </li>
+                    <li class="nav-item nav-item-has-subnav">
+                        <a href="javascript:void(0)"><i class="mdi mdi-settings"></i> 云存储管理</a>
+                        <ul class="nav nav-subnav">
+                            {{range $i,$v := .storeMenu}}
+                            <li> <a class="multitabs" href="/system/storemenu?type={{$v.Path}}">{{$v.Name}}</a> </li>
+                            {{end}}
+                        </ul>
+                    </li>
+                    {{end}}
+                </ul>
+            </nav>
+
+            <div class="sidebar-footer">
+                <p class="copyright">空间使用率 <a target="_blank" href="/">扩容</a></p>
+                <div class="progress">
+                    <div class="progress-bar {{if gt .imgper 70}}progress-bar-danger{{end}}" role="progressbar" style="width: {{.imgper}}%;" aria-valuenow="{{.imgper}}" aria-valuemin="0" aria-valuemax="100">
+                        {{.imgper}}%
+                    </div>
+                </div>
+                <p class="copyright">Copyright &copy; 2020. <a target="_blank" href="/">{{.config.WebName}}</a> All rights reserved.</p>
+            </div>
+        </div>
+    </aside>
+{{end}}

@@ -1,0 +1,185 @@
+<!DOCTYPE html>
+<html>
+<head>
+    <meta charset="utf-8">
+    <meta name="keywords" content="{{.Config.KeyWord}}" />
+    <meta name="description" content="{{.Config.SiteDescription}}" />
+    <meta name="viewport" content="width=device-width, initial-scale=1, maximum-scale=1">
+    <title>{{.Config.WebName}}</title>
+    <link rel="stylesheet" href="/static/home/layui/layui/css/layui.css">
+    <style>
+        a{text-decoration:none}
+        a:hover{text-decoration:none}
+        .layui-layout-admin .layui-logo{color:#fff}
+        .layui-layout-admin .layui-footer{left:0;text-align:center}
+        .layui-upload-choose{display:none}
+        #multiple{width:100%;-moz-box-sizing:border-box;-o-box-sizing:border-box;-ms-box-sizing:border-box;box-sizing:border-box}
+        #uploadDemoView{margin-top:10px;padding-top:10px;border-top:1px solid #eee}
+        .uploadBox{padding:0 30px;width:80%;margin:0 auto;margin-bottom:44px}
+        .layui-table{text-align:center}
+        .layui-tab-title{text-align:center}
+    </style>
+</head>
+<body>
+<div class="layui-layout layui-layout-admin">
+    {{template "index_header" .}}
+    <div class="uploadBox">
+        <fieldset class="layui-elem-field layui-field-title" style="margin-top: 30px;">
+            <legend>列表上传</legend>
+        </fieldset>
+        <div class="layui-upload">
+            {{if eq .Upload.AllowUpload 1}}
+            <button type="button" class="layui-btn layui-btn-normal" id="testList">选择多文件</button>
+            <div class="layui-upload-list">
+                <table class="layui-table">
+                    <thead>
+                    <tr><th>文件名</th>
+                        <th>大小</th>
+                        <th>状态</th>
+                        <th>操作</th>
+                    </tr></thead>
+                    <tbody id="demoList"></tbody>
+                </table>
+            </div>
+            <button type="button" class="layui-btn" id="testListAction">开始上传</button>
+            {{else}}
+                <h1 style="text-align: center;color: #dddddd">管理员已禁止游客上传，请登陆</h1>
+            {{end}}
+        </div>
+        <div class="successAppend layui-hide">
+            <div class="layui-tab layui-tab-brief" lay-filter="docDemoTabBrief">
+                <ul class="layui-tab-title">
+                    <li class="layui-this">URL</li>
+                    <li>HTML</li>
+                    <li>Markdown</li>
+                    <li>BBCode</li>
+                </ul>
+                <div class="layui-tab-content">
+                    <div class="layui-tab-item layui-show">
+                        <table class="layui-table" lay-even="" lay-skin="nob">
+                            <tbody id="url_table"></tbody>
+                        </table>
+                    </div>
+                    <div class="layui-tab-item">
+                        <table class="layui-table" lay-even="" lay-skin="nob">
+                            <tbody id="html_table"></tbody>
+                        </table>
+                    </div>
+                    <div class="layui-tab-item">
+                        <table class="layui-table" lay-even="" lay-skin="nob">
+                            <tbody id="markdown_table"></tbody>
+                        </table>
+                    </div>
+                    <div class="layui-tab-item">
+                        <table class="layui-table" lay-even="" lay-skin="nob">
+                            <tbody id="bbcode_table"></tbody>
+                        </table>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+    <div class="layui-footer">
+        <!-- 底部固定区域 -->
+        © {{.Config.Copyright}}
+    </div>
+</div>
+<script src="/static/home/layui/layui/layui.js"></script>
+<script src="/static/home/clipboard.min.js"></script>
+<script>
+    layui.use(['element','upload'], function(){
+        var $ = layui.jquery ,element = layui.element,upload = layui.upload;
+        //多文件列表示例
+        var demoListView = $('#demoList')
+            ,uploadListIns = upload.render({
+                elem: '#testList'
+                , exts: '{{.Upload.AllowImgUploadExt}}'
+                , size: {{.Upload.FileSize}} //限制文件大小，单位 KB
+                , url: '/uploads' //改成您自己的上传接口
+                , accept: 'file'
+                , multiple: true
+                , auto: false
+                , bindAction: '#testListAction'
+                ,choose: function(obj){
+                    var files = this.files = obj.pushFile(); //将每次选择的文件追加到文件队列
+                    var len = getJsonLength(files);
+                    if(parseInt(len) > parseInt({{.Upload.ImgCount}})){
+                        layer.msg("单次上传图片不能超出" + {{.Upload.ImgCount}} + "张");
+                        return;
+                    }
+                    //读取本地文件
+                    obj.preview(function(index, file, result){
+                        var tr = $(['<tr id="upload-'+ index +'">'
+                            ,'<td>'+ file.name +'</td>'
+                            ,'<td>'+ (file.size/1024).toFixed(1) +'kb</td>'
+                            ,'<td>等待上传</td>'
+                            ,'<td>'
+                            ,'<button class="layui-btn layui-btn-xs demo-reload layui-hide">重传</button>'
+                            ,'<button class="layui-btn layui-btn-xs layui-btn-danger demo-delete">删除</button>'
+                            ,'</td>'
+                            ,'</tr>'].join(''));
+
+                        //单个重传
+                        tr.find('.demo-reload').on('click', function(){
+                            obj.upload(index, file);
+                        });
+
+                        //删除
+                        tr.find('.demo-delete').on('click', function(){
+                            delete files[index]; //删除对应的文件
+                            tr.remove();
+                            uploadListIns.config.elem.next()[0].value = ''; //清空 input file 值，以免删除后出现同名文件不可选
+                        });
+
+                        demoListView.append(tr);
+                    });
+                }
+            ,done: function(res, index, upload){
+                if(res.code == 200){ //上传成功
+                    var tr = demoListView.find('tr#upload-'+ index)
+                        ,tds = tr.children();
+                    tds.eq(2).html('<span style="color: #5FB878;">上传成功</span>');
+                    tds.eq(3).html(''); //清空操作
+
+                    $.each(res.data,function (i,item) {
+                        layui.$('.successAppend').removeClass('layui-hide');
+                        layui.$('#uploadDemoView').removeClass('layui-hide');
+                        $('#uploadDemoView').append(' <img src="'+item.imgurls+'" alt="'+item.imgnames+'" style="max-width: 120px;margin: 5px;">')
+                        $('#url_table').append('<tr><td>URL</td><td>'+item.imgurls+'</td><td style="width: 80px;"><button class="layui-btn copybtn"  data-clipboard-text="'+item.imgurls+'">复制</button></td></tr>')
+                        var htmlStr = '&lt;img src="' + item.imgurls + '"/&gt;'
+                        $('#html_table').append('<tr><td>HTML</td><td>'+htmlStr+'</td><td style="width: 80px;"><button class="layui-btn copybtn" data-clipboard-target="#htmlcode">复制</button></td></tr>')
+                        $('#html_table').append("<input class='layui-hide' id='htmlcode' value='"+htmlStr+"' />")
+                        $('#markdown_table').append('<tr><td>Markdown</td><td>![]('+item.imgurls+')</td><td style="width: 80px;"><button class="layui-btn copybtn" data-clipboard-text="![]('+item.imgurls+')">复制</button></td></tr>')
+                        $('#bbcode_table').append('<tr><td>BBCode</td><td>[img]'+item.imgurls+'[/img]</td><td style="width: 80px;"><button class="layui-btn copybtn" data-clipboard-text="[img]'+item.imgurls+'[/img]">复制</button></td></tr>')
+                    })
+                    return delete this.files[index]; //删除文件队列已经上传成功的文件
+                }
+                this.error(index, upload);
+            }
+            ,error: function(index, upload){
+                var tr = demoListView.find('tr#upload-'+ index)
+                    ,tds = tr.children();
+                tds.eq(2).html('<span style="color: #FF5722;">上传失败</span>');
+                tds.eq(3).find('.demo-reload').removeClass('layui-hide'); //显示重传
+            }
+        });
+    });
+    var clipboard = new ClipboardJS('.copybtn');
+    clipboard.on('success', function(e) {
+        layer.msg("复制成功")
+    });
+    clipboard.on('error', function(e) {
+        layer.msg("复制失败")
+    });
+
+    //json的length
+    function getJsonLength(jsonData){
+        var jsonLength = 0;
+        for(var item in jsonData){
+            jsonLength++;
+        }
+        return jsonLength;
+    }
+</script>
+</body>
+</html>

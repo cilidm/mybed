@@ -1,0 +1,145 @@
+{{template "frame_top"}}
+<link rel="stylesheet" href="/static/admin/js/jquery-tags-input/jquery.tagsinput.min.css">
+<div class="container-fluid p-t-15">
+    <div class="row">
+        <div class="col-lg-12">
+            <div class="card">
+                <ul class="nav nav-tabs page-tabs">
+                  <li> <a href="/system/site_config">基本</a> </li>
+                    <li class="active"> <a href="/system/site_upload">上传</a> </li>
+                    <li> <a href="/system/site_mail">邮箱配置</a> </li>
+                    <li> <a href="/system/site_examine">图片鉴黄</a> </li>
+                </ul>
+                <div class="tab-content">
+                    <div class="tab-pane active">
+
+                        <form id="site_config" name="edit-form" class="edit-form">
+                            <div class="form-group">
+                                <label for="upload_file_ext">允许上传的图片后缀</label>
+                                <input class="js-tags-input form-control" type="text" id="allow_img_upload_ext"
+                                       name="allow_img_upload_ext"
+                                value="{{.AllowImgUploadExt}}">
+                                <small class="help-block">多个后缀用逗号隔开，不填写则不限制类型</small>
+                            </div>
+                            <div class="divider text-uppercase">会员配置</div>
+                            <div class="form-group">
+                                <label for="upload_image_size">会员上传总容量</label>
+                                <input class="form-control" type="text" id="member_img_total_size" name="member_img_total_size"
+                                       value="{{.MemberImgTotalSize}}" placeholder="请输入会员上传总容量">
+                                <small class="help-block">0为不限制大小，单位：mb</small>
+                            </div>
+                            <div class="form-group">
+                                <label for="upload_image_size">会员图片上传大小限制</label>
+                                <input class="form-control" type="text" id="member_img_size" name="member_img_size"
+                                       value="{{.MemberImgSize}}" placeholder="请输入图片上传大小限制">
+                                <small class="help-block">0为不限制大小，单位：mb</small>
+                            </div>
+                            <div class="form-group">
+                                <label for="upload_image_size">会员图片保存天数</label>
+                                <input class="form-control" type="text" id="member_explains" name="member_explains"
+                                       value="{{.MemberExplains}}" placeholder="">
+                                <small class="help-block">0为不限制</small>
+                            </div>
+                            <div class="form-group">
+                                <label for="upload_image_size">会员单次上传数量限制</label>
+                                <input class="form-control" type="text" id="member_img_num" name="member_img_num"
+                                       value="{{.MemberImgNum}}" placeholder="请输入会员单次上传数量限制">
+                            </div>
+                            <div class="divider text-uppercase">游客配置</div>
+                            <div class="form-group">
+                                <label class="btn-block" for="web_site_status">允许游客上传</label>
+                                <label class="lyear-switch switch-solid switch-primary">
+                                    <input type="checkbox" id="allow_visitor_button" name="allow_visitor_button" {{if eq .AllowVisitor 1}}checked=""{{end}}>
+                                    <span></span>
+                                </label>
+                                <small class="help-block">禁止后必须登陆才可以上传</small>
+                            </div>
+                            <div class="form-group">
+                                <label for="upload_image_size">游客上传总容量</label>
+                                <input class="form-control" type="text" id="visitor_img_total_size" name="visitor_img_total_size"
+                                       value="{{.VisitorImgTotalSize}}" placeholder="请输入游客上传总容量">
+                                <small class="help-block">0为不限制大小，单位：mb</small>
+                            </div>
+                            <div class="form-group">
+                                <label for="upload_image_size">游客图片上传大小限制</label>
+                                <input class="form-control" type="text" id="visitor_img_size" name="visitor_img_size"
+                                       value="{{.VisitorImgSize}}" placeholder="请输入游客图片上传大小限制">
+                                <small class="help-block">0为不限制大小，单位：mb</small>
+                            </div>
+                            <div class="form-group">
+                                <label for="upload_image_size">游客图片保存天数</label>
+                                <input class="form-control" type="text" id="visitor_explains" name="visitor_explains"
+                                       value="{{.VisitorExplains}}" placeholder="">
+                            </div>
+                            <div class="form-group">
+                                <label for="upload_image_size">游客单次上传数量限制</label>
+                                <input class="form-control" type="text" id="visitor_img_num" name="visitor_img_num"
+                                       value="{{.VisitorImgNum}}" placeholder="请输入游客单次上传数量限制">
+                            </div>
+                            <div class="divider text-uppercase">文件配置</div>
+                            <div class="form-group">
+                                <label for="upload_image_ext">允许上传的文件后缀</label>
+                                <input class="js-tags-input form-control" type="text" id="allow_upload_ext"
+                                       name="allow_upload_ext" value="{{.AllowUploadExt}}">
+                                <small class="help-block">多个后缀用逗号隔开，不填写则不限制类型</small>
+                            </div>
+                            <div class="form-group">
+                                <label for="upload_file_size">文件上传大小限制</label>
+                                <input class="form-control" type="text" id="max_upload_size" name="max_upload_size"
+                                       value="{{.MaxUploadSize}}" placeholder="请输入文件上传大小限制">
+                                <small class="help-block">0为不限制大小，单位：mb</small>
+                            </div>
+                            <input type="hidden" name="form_type" value="2">
+                            <div class="form-group">
+                                <button type="button" class="btn btn-primary m-r-5" onclick="submitForm()">确 定</button>
+                                <button type="button" class="btn btn-default" onclick="javascript:history.back(-1);return false;">返 回
+                                </button>
+                            </div>
+                        </form>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+{{template "frame_js"}}
+<script src="/static/admin/js/jquery-tags-input/jquery.tagsinput.min.js"></script>
+<script src="/static/admin/js/bootstrap-notify.min.js"></script>
+<script type="text/javascript" src="/static/admin/js/lightyear.js"></script>
+<script>
+    function submitForm() {
+        lightyear.loading('show');  // 显示
+        $.ajax({
+            //几个参数需要注意一下
+            type: "POST",//方法类型
+            dataType: "json",//预期服务器返回的数据类型
+            url: "/system/site_upload" ,//url
+            data: $('#site_config').serialize(),
+            success: function (result) {
+                lightyear.loading('hide');  // 隐藏
+                console.log(result);//打印服务端返回的数据(调试用)
+                if (result.resultCode == 200) {
+                    lightyear.notify('修改成功~', 'success', 1000, 'mdi mdi-emoticon-happy', 'top', 'center');
+                    setTimeout(function () {
+                        location.reload();
+                    },1000)
+                }else{
+                    lightyear.notify('异常！'+result.errorMsg, 'warning', 1000, 'mdi mdi-emoticon-happy', 'top', 'center');
+                    setTimeout(function () {
+                        location.reload();
+                    },1000)
+                }
+            },
+            error : function(result) {
+                console.log(result.errorMsg)
+                lightyear.loading('hide');  // 隐藏
+                lightyear.notify('异常！' + result.errorMsg, 'warning', 1000, 'mdi mdi-emoticon-happy', 'top', 'center');
+                setTimeout(function () {
+                    location.reload();
+                },1000)
+            }
+        });
+    }
+</script>
+</body>
+</html>

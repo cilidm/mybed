@@ -1,0 +1,18 @@
+{{define "page"}}
+    <nav id="page"></nav>
+    <script type="text/javascript" src="/static/admin/js/perfect-scrollbar.min.js"></script>
+    <script type="text/javascript" src="/static/admin/js/xlPaging.js"></script>
+    <script>
+        let a =new Paging('page', {
+            nowPage: {{.page}}, // 当前页码
+            pageNum: {{.pageCount}}, // 总页码
+            buttonNum: 8, //要展示的页码按钮数量
+            canJump: 0,// 是否能跳转。0=不显示（默认），1=显示
+            showOne: 0,//只有一页时，是否显示。0=不显示,1=显示（默认）
+            sitePath: window.location.protocol+"//"+window.location.host+window.location.pathname,
+            callback: function (num) { //回调函数
+                console.log(num);
+            }
+        })
+    </script>
+{{end}}
