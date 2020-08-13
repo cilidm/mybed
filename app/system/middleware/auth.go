@@ -3,6 +3,7 @@ package middleware
 import (
 	"github.com/gin-gonic/gin"
 	"mybedv2/app/helper/e"
+	"mybedv2/app/system/model/site"
 	"mybedv2/app/system/model/upload"
 	"mybedv2/app/system/service/user"
 	"net/http"
@@ -37,6 +38,15 @@ func CheckConfigUpload(c *gin.Context) {
 	config := uploadEntity.FindOne()
 	if config.AllowVisitor == 2 && (user.IsLogin(c) == false) {
 		c.JSON(http.StatusBadRequest, gin.H{"code": e.ERROR, "msg": "管理员已禁止游客上传"})
+		c.Abort()
+	}
+}
+
+func CheckSiteConfig(c *gin.Context) {
+	siteEntity := new(site.Entity)
+	config := siteEntity.FindOne()
+	if config.SiteStatus == 2 {
+		c.Redirect(http.StatusFound, "/system/site_close")
 		c.Abort()
 	}
 }

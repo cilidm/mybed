@@ -59,6 +59,10 @@ func PageNotFound(c *gin.Context) {
 	c.HTML(http.StatusOK, "page_not_found.html", gin.H{})
 }
 
+func SiteClose(c *gin.Context) {
+	c.HTML(http.StatusOK, "site_close.html", gin.H{})
+}
+
 func EditPwd(c *gin.Context) {
 	c.HTML(http.StatusOK, "edit_pwd.html", gin.H{})
 }

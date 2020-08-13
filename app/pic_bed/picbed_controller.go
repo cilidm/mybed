@@ -24,9 +24,7 @@ type PicbedPageResp struct {
 }
 
 func LoginPage(c *gin.Context) {
-	var (
-		site site.Entity
-	)
+	var site site.Entity
 	config := site.FindOne()
 	c.HTML(http.StatusOK, "login.html", gin.H{"config": config})
 }

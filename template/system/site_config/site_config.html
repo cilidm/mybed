@@ -51,12 +51,11 @@
                 <input class="form-control" type="text" id="record_info" name="record_info" value="{{.RecordInfo}}" placeholder="请输入备案信息" >
               </div>
               <div class="form-group">
-                <label class="btn-block" for="web_site_status">站点开关</label>
+                <label class="btn-block" for="web_site_status">是否开启注册</label>
                 <label class="lyear-switch switch-solid switch-primary">
                   <input type="checkbox" id="site_status" name="site_status" {{if eq .SiteStatus 1}}checked=""{{end}}>
                   <span></span>
                 </label>
-                <small class="help-block">站点关闭后将不能访问，后台可正常登录</small>
               </div>
               <input type="hidden" name="form_type" value="1">
               <div class="form-group">
