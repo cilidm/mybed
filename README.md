@@ -30,7 +30,7 @@
 git clone https://github.com/cilidm/mybed.git
 ```
 
-### 导入数据库
+### 配置数据库
 
 创建任意名称的数据库, 字符集选择 `utf8`, 排序规则选择 `utf8_general_ci`. 
 修改conf文件夹下`app.ini`文件，`[database]` 下的`DBUser DBPwd DBHost DBTableName` 四项 
