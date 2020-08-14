@@ -1,690 +1,690 @@
 {{define "frame_index_js"}}
-<script>
-    $("#myModal modal-backdrop").addClass('show')
-    var isday = {{.Upload.Explains}}; //图片保存期限
-    var verification = false;
-    var zcverification = false;
-    var userclose = 1;
-    var logotmp = 0;
-    var zctmp = 0;
-    var arr_imgurl = "";
-    var arr_url = "";
-    var arr_markdown = "";
-    var arr_html = "";
-    var arr_ddcode = "";
-    var urltypes = 1;//1 url 2 md 3 a标签 4 论坛格式
-    var VisitorUpload = {{.Upload.AllowUpload}}; //0禁止游客上传
-    var filesize = {{.Upload.FileSize}};
-    var imgcount = {{.Upload.ImgCount}};
-    var theme = 2;
-    var exp = $("#exp").val();
-    var suffix= $('#suffix').val();
-    var qq ='hellohao-code-yz';
-    var layer;
-    layui.use('layer', function(){
-        layer = layui.layer;
-        //url(../images/img2.png) center 93px no-repeat
-        feather.replace();
-    });
-    $(function () {
-        $.ajax({
-            type: "POST",
-            url: "/islogin",
-            dataType: "json",
-            success: function (data) {
-                if(data.lgoinret==1){
-                    bodys();
-                }
-            }
-        });
-        if(exp!="" && exp!=null && typeof(exp) != undefined){
-            $("#explaindiv").show();
-            $("#explain").text(exp);
-        }else{
-            $("#explaindiv").hide();
-        }
+{{/*<script>*/}}
+{{/*    $("#myModal modal-backdrop").addClass('show')*/}}
+{{/*    var isday = {{.Upload.Explains}}; //图片保存期限*/}}
+{{/*    var verification = false;*/}}
+{{/*    var zcverification = false;*/}}
+{{/*    var userclose = 1;*/}}
+{{/*    var logotmp = 0;*/}}
+{{/*    var zctmp = 0;*/}}
+{{/*    var arr_imgurl = "";*/}}
+{{/*    var arr_url = "";*/}}
+{{/*    var arr_markdown = "";*/}}
+{{/*    var arr_html = "";*/}}
+{{/*    var arr_ddcode = "";*/}}
+{{/*    var urltypes = 1;//1 url 2 md 3 a标签 4 论坛格式*/}}
+{{/*    var VisitorUpload = {{.Upload.AllowUpload}}; //0禁止游客上传*/}}
+{{/*    var filesize = {{.Upload.FileSize}};*/}}
+{{/*    var imgcount = {{.Upload.ImgCount}};*/}}
+{{/*    var theme = 2;*/}}
+{{/*    var exp = $("#exp").val();*/}}
+{{/*    var suffix= $('#suffix').val();*/}}
+{{/*    var qq ='hellohao-code-yz';*/}}
+{{/*    var layer;*/}}
+{{/*    layui.use('layer', function(){*/}}
+{{/*        layer = layui.layer;*/}}
+{{/*        //url(../images/img2.png) center 93px no-repeat*/}}
+{{/*        feather.replace();*/}}
+{{/*    });*/}}
+{{/*    $(function () {*/}}
+{{/*        $.ajax({*/}}
+{{/*            type: "POST",*/}}
+{{/*            url: "/islogin",*/}}
+{{/*            dataType: "json",*/}}
+{{/*            success: function (data) {*/}}
+{{/*                if(data.lgoinret==1){*/}}
+{{/*                    bodys();*/}}
+{{/*                }*/}}
+{{/*            }*/}}
+{{/*        });*/}}
+{{/*        if(exp!="" && exp!=null && typeof(exp) != undefined){*/}}
+{{/*            $("#explaindiv").show();*/}}
+{{/*            $("#explain").text(exp);*/}}
+{{/*        }else{*/}}
+{{/*            $("#explaindiv").hide();*/}}
+{{/*        }*/}}
 
-    });
+{{/*    });*/}}
 
-    function tologin() {
+{{/*    function tologin() {*/}}
 
-        var html = ' <p style="display: block;float: right;margin-top: 5px; cursor:pointer;margin-right: 13px;font-size: 24px;" onclick="Closelogin()">×</p>\n' +
-            '                <div class="login-top">\n' +
-            '                    登录\n' +
-            '                </div>\n' +
-            '                <div class="login-center clearfix">\n' +
-            //'                    <div class="login-center-img"><img th:src="@{/img/name.png}"/></div>\n' +
-            '                    <div class="login-center-input">\n' +
-            '                        <input type="text" id="loginemail" name="" value="" placeholder="请输入您的账号" onfocus="this.placeholder=\'\'" onblur="this.placeholder=\'请输入您的邮箱\'"/>\n' +
-            '                        <div class="login-center-input-text">账号</div>\n' +
-            '                    </div>\n' +
-            '                </div>\n' +
-            '                <div class="login-center clearfix">\n' +
-            //'                    <div class="login-center-img"><img th:src="@{/img/password.png}"/></div>\n' +
-            '                    <div class="login-center-input">\n' +
-            '                        <input type="password" id="loginpassword" name=""value="" placeholder="请输入您的密码" onfocus="this.placeholder=\'\'" onblur="this.placeholder=\'请输入您的密码\'"/>\n' +
-            '                        <div class="login-center-input-text">密码</div>\n' +
-            '                    </div>\n' +
-            '                </div>\n' +
-            '                <div class="login-center clearfix">\n' +
-            '                    <div style="width: 280px;height: 50px;">\n' +
-            '                        <div id="mpanel1" ondragstart="return false" ></div>\n' +
-            '                    </div>\n' +
-            '                </div>\n' +
-            '                <div class="login-button" onclick="loginAjax()">\n' +
-            '                    登陆\n' +
-            '                </div>'+
-            '                <div><a onclick="retrievepass()" style="margin-top:15px;margin-right: 51px;float: right;font-size: 12px;cursor:pointer;">重置密码</a></div>';
-
-
-
-        $('.login').html(html);
-        $('#zhezhao').show();
-        $('.login').show();
-        $('.login').addClass('animated  slideInDown');
-        $('body').css({
-            "overflow-x":"hidden",
-            "overflow-y":"hidden"
-        });
-        initSlideVerify(1);
-    }
-
-    function toregister() {
-        var html = '<p style="display: block;float: right;margin-top: 5px; cursor:pointer;margin-right: 13px;font-size: 24px;" onclick="Closelogin()">×</p>\n' +
-            '            <div class="login-top" style="margin-top: 50px;">\n' +
-            '                注册\n' +
-            '            </div>\n' +
-            '            <p align="center" style="color: #db5860;margin-top: -40px;" id="zcts"></p>\n' +
-            '            <div class="login-center clearfix">\n' +
-            //'                <div class="login-center-img"><img th:src="@{/img/name.png}"/></div>\n' +
-            '                <div class="login-center-input">\n' +
-            '                    <input type="text" id="registerusername" name="username" value="" placeholder="用户名(数字/字母不得超过10位)" onfocus="this.placeholder=\'\'" onblur="this.placeholder=\'用户名(数字/字母不得超过10位)\'"/>\n' +
-            '                    <div class="login-center-input-text">用户名</div>\n' +
-            '                </div>\n' +
-            '            </div>\n' +
-            '            <div class="login-center clearfix">\n' +
-            //'                <div class="login-center-img"><img th:src="@{/img/name.png}"/></div>\n' +
-            '                <div class="login-center-input">\n' +
-            '                    <input type="text" id="registeremail" name="email" value="" placeholder="待验证的邮箱" onfocus="this.placeholder=\'\'" onblur="this.placeholder=\'待验证的邮箱\'"/>\n' +
-            '                    <div class="login-center-input-text">邮箱</div>\n' +
-            '                </div>\n' +
-            '            </div>\n' +
-            '            <div class="login-center clearfix">\n' +
-            //'                <div class="login-center-img"><img th:src="@{/img/password.png}"/></div>\n' +
-            '                <div class="login-center-input">\n' +
-            '                    <input type="password" id="registerpassword" name="password" value="" placeholder="请输入您的密码" onfocus="this.placeholder=\'\'" onblur="this.placeholder=\'请输入您的密码\'"/>\n' +
-            '                    <div class="login-center-input-text">密码</div>\n' +
-            '                </div>\n' +
-            '            </div>\n' +
-            '            <div class="login-center clearfix">\n' +
-            //'                <div class="login-center-img"><img th:src="@{/img/password.png}"/></div>\n' +
-            '                <div class="login-center-input">\n' +
-            '                    <input type="password" id="registerpassword_confirmation" name="password" value="" placeholder="请输入您的密码" onfocus="this.placeholder=\'\'" onblur="this.placeholder=\'请输入您的密码\'"/>\n' +
-            '                    <div class="login-center-input-text">密码</div>\n' +
-            '                </div>\n' +
-            '            </div>\n' +
-            '            <div class="login-center clearfix">\n' +
-            '                <div style="width: 280px;height: 50px;">\n' +
-            '                    <div id="mpanel2" onselectstart="return true"></div>\n' +
-            '                </div>\n' +
-            '            </div>\n' +
-            '            <div class="login-button" onclick="ismail();">\n' +
-            '                注册\n' +
-            '            </div>';
-
-        $('.login').html(html);
-        $('#zhezhao').show();
-        $('.login').show();
-        $('.login').addClass('animated  slideInDown');
-        $('body').css({
-            "overflow-x":"hidden",
-            "overflow-y":"hidden"
-        });
-        initSlideVerify(2);
-    }
-
-    function Closelogin() {
-        $('#zhezhao').hide();
-        $('.login').hide();
-        $('.registers').hide();
-        $('body').css({
-            "overflow-x":"auto",
-            "overflow-y":"auto"
-        });
-    }
-
-    function imgsc() {
-        var str = '输入图片URL地址：';
-        if(isday>0){
-            str = '输入图片URL地址：('+isday+'天后将会自动销毁)';
-        }
-        swal(str, {
-            content: "input",
-        })
-            .then((value) => {
-                var result =value;
-                if(result!=null && result!="" ){
-                    urlimg(result);
-                }
-            });
-    }
-    function urlimg(result) {
-        if(result) {
-            var rx=/^https?:\/\//i;
-            if(rx.test(result)==true){
-                var msgid = layer.msg('上传中..', {
-                    icon: 16
-                    ,shade: 0.01
-                });
-                $('#loadingModal').modal({backdrop: 'static', keyboard: false,upurlk:qq});
-                $.ajax({
-                    type: "POST",
-                    url: "/upurlimg",
-                    dataType: "json",
-                    data: {imgurl: result,setday:isday,upurlk:qq},
-                    success: function (data) {
-                        layer.close(msgid);
-                        if(data.code=='4006'){
-                            $('#loadingModal').modal('hide');
-                            swal('上传失败', '图片超出上传大小限制');
-                        }
-                        else if(data.code=='4005'){
-                            $('#loadingModal').modal('hide');
-                            swal('上传失败', '可用空间不足');
-                        }
-                        else if(data.code=='4000'){
-                            $('#loadingModal').modal('hide');
-                            swal('上传失败', '文件类型不符合要求');
-                        }else if(data.code=='4003'){
-                            $('#loadingModal').modal('hide');
-                            swal('非法调用，请刷新页面后重试');
-                        }else if(data.code==911){
-                            $('#loadingModal').modal('hide');
-                            swal('你目前不能上传图片,请联系管理员');
-                        }else if(data.code=='1000'){
-                            $('#loadingModal').modal('hide');
-                            swal('上传失败，管理员已经关闭你的上传功能');
-                        }else{
-                            for(var i=0;i<data.data.length;i++){
-                                $('#loadingModal').modal('hide');
-                                swal('上传成功', '该图片链接已成功上传');
-                                $("#address").css('display', 'block');
-                                $("#updateurl").show();
-                                arr_url += data.data[i] + '\r\n';
-                                arr_imgurl += '<li onclick="copyimgurl(this)" class="copyimgurl"><span class="line"></span><i class="icon fab fa-gg"></i><p class="fontstyle" >'+data.data[i]+ '</p></li>';
-                                arr_markdown += '<li onclick="copyimgurl(this)" class="copyimgurl "><span class="line"></span><i class="icon fab fa-gg"></i><p class="fontstyle">'+'![image](data.data[i])</p></li>';
-                                arr_html += '<li onclick="copyimgurl(this)" class="copyimgurl "><span class="line"></span><i class="icon fab fa-gg"></i><p class="fontstyle">'+'&lt;img src="' + data.data[i] + '" alt="image" /&gt; </p></li>';
-                                arr_ddcode +='<li onclick="copyimgurl(this)" class="copyimgurl"><span class="line"></span><i class="icon fab fa-gg"></i><p class="fontstyle">'+'[img]'+data.data[i]+'[/img]</p></li>';
-                                if(urltypes==1){
-                                    $("#imgurls").html(arr_imgurl);
-                                }else if(urltypes==2){
-                                    $("#imgurls").html(arr_markdown);
-                                }else if(urltypes==3){
-                                    $("#imgurls").html(arr_html);
-                                }else{
-                                    $("#imgurls").html(arr_ddcode);
-                                }
-                            }
-                        }
-                    }
-                });
-            }else{layer.close(msgid);Popups('网址格式错误','网址必须以http(s)://开头。','error');}
-        }
-    }
-
-    function setday() {
-        swal("输入图片期限（天）,到期自动销毁图片,最高365天：\n(输入0为永久保存)", {
-            content: "input",
-            html: true,
-        })
-            .then((value) => {
-                var result =value;
-                var reg=/^[0-9]\d*$/;
-                if(result!=null && result!="" ){
-                    if(reg.test(result)){
-                        if(result<=365){
-                            isday = result;
-                            // 初始化以后添加
-                            uploader.options.formData.setday = isday;
-                        }else{
-                            swal('输入天数有误，最大不可超过365天');
-                        }
-                    }else{
-                        swal('输入格式不正确，只可输入0-9之间正整数');
-                    }
-                }
-                if(isday>0){
-                    $('#setday').text(isday+'天后销毁');
-                }else{
-                    $('#setday').text('图片期限');
-                }
-            });
-    }
-    function keyLogin(){
-        if (event.keyCode==13)
-            document.getElementById("dl").click();
-    }
-
-    function loginAjax() {
-        var loginemail = $("#loginemail").val();
-        var loginpassword = $("#loginpassword").val();
-        if(verification){
-            //验证成功
-            $.ajax({
-                type: "POST",
-                url: "/login",
-                data: {username: loginemail, password: loginpassword,logotmp:logotmp},
-                dataType: "json",
-                success: function (data) {
-                    console.log(data.resultCode);
-                    $('#loginModal').modal('hide');
-                    if (data.resultCode == 200) {
-                        Closelogin();
-                        layer.msg('登录成功', {icon: 1});
-                        setTimeout(function () {
-                            bodys();
-                            window.location.reload();
-                        }, 1000);
-                    } else {
-                        if (data.resultCode == -1) {
-                            //$('#dlts').text('您的账号是未激活状态，无法登陆。');
-                            layer.msg('此账号是未激活状态，无法登陆', {icon: 4});
-                            again(1);
-                        } else if(data.resultCode==-2){
-                            //$('#dlts').text('您的账号已被冻结。');
-                            layer.msg('您的账号处于冻结状态', {icon: 2});
-                            again(1);
-                        }else if(data.resultCode==-3){
-                            //$('#dlts').text('非法登录，请刷新页面重新尝试。');
-                            layer.msg('非法登录，请刷新页面重新尝试', {icon: 2});
-                            again(1);
-                        }
-                        else {
-                            //$('#dlts').text('登录失败，你的邮箱或密码不正确，请重试。');
-                            layer.msg('登录失败，账号或者密码不正确', {icon: 2});
-                            again(1);
-                        }
-                        setTimeout(function () {
-                            //window.location.reload();
-                        }, 2000);
-                    }
-                }
-            });
-        }else{
-            //$('#dlts').text('请滑动验证码进行验证，才可登录。');
-            layer.msg('请滑动验证码进行验证，才可登录。', {icon: 2});
-        }
-    }
-
-    function initSlideVerify(v) {
-        if(v==1){
-            $('#mpanel1').slideVerify({
-                type : 1,		//类型
-                vOffset : 5,	//误差量，根据需求自行调整
-                barSize : {
-                    width : '100%',
-                    height : '40px',
-                },
-                ready : function() {
-                },
-                success : function() {
-                    verification = true;
-                    var myDate = new Date();
-                    var tmp = Number(myDate.getMinutes()+''+myDate.getSeconds());
-                    logotmp = (tmp-500+1+2+3-4);
-                    $.ajax({
-                        type: "POST",
-                        url: "/user/verification",
-                        data:{tmp:logotmp,type:1},
-                        dataType: "json",
-                        success: function (data) {}
-                    });
-                },
-                error : function() {}
-            });
-        }else{
-            $('#mpanel2').slideVerify({
-                type : 1,		//类型
-                vOffset : 5,	//误差量，根据需求自行调整
-                barSize : {
-                    width : '100%',
-                    height : '40px',
-                },
-                ready : function() {
-                },
-                success : function() {
-                    zcverification = true;
-                    var myDate = new Date();
-                    var tmp = Number(myDate.getMinutes()+''+myDate.getSeconds());
-                    zctmp = (tmp-500+1+2+3-4);
-                    $.ajax({
-                        type: "POST",
-                        url: "/user/verification",
-                        data:{tmp:zctmp,type:2},
-                        dataType: "json",
-                        success: function (data) {}
-                    });
-                },
-                error : function() {}
-            });
-        }
-    }
+{{/*        var html = ' <p style="display: block;float: right;margin-top: 5px; cursor:pointer;margin-right: 13px;font-size: 24px;" onclick="Closelogin()">×</p>\n' +*/}}
+{{/*            '                <div class="login-top">\n' +*/}}
+{{/*            '                    登录\n' +*/}}
+{{/*            '                </div>\n' +*/}}
+{{/*            '                <div class="login-center clearfix">\n' +*/}}
+{{/*            //'                    <div class="login-center-img"><img th:src="@{/img/name.png}"/></div>\n' +*/}}
+{{/*            '                    <div class="login-center-input">\n' +*/}}
+{{/*            '                        <input type="text" id="loginemail" name="" value="" placeholder="请输入您的账号" onfocus="this.placeholder=\'\'" onblur="this.placeholder=\'请输入您的邮箱\'"/>\n' +*/}}
+{{/*            '                        <div class="login-center-input-text">账号</div>\n' +*/}}
+{{/*            '                    </div>\n' +*/}}
+{{/*            '                </div>\n' +*/}}
+{{/*            '                <div class="login-center clearfix">\n' +*/}}
+{{/*            //'                    <div class="login-center-img"><img th:src="@{/img/password.png}"/></div>\n' +*/}}
+{{/*            '                    <div class="login-center-input">\n' +*/}}
+{{/*            '                        <input type="password" id="loginpassword" name=""value="" placeholder="请输入您的密码" onfocus="this.placeholder=\'\'" onblur="this.placeholder=\'请输入您的密码\'"/>\n' +*/}}
+{{/*            '                        <div class="login-center-input-text">密码</div>\n' +*/}}
+{{/*            '                    </div>\n' +*/}}
+{{/*            '                </div>\n' +*/}}
+{{/*            '                <div class="login-center clearfix">\n' +*/}}
+{{/*            '                    <div style="width: 280px;height: 50px;">\n' +*/}}
+{{/*            '                        <div id="mpanel1" ondragstart="return false" ></div>\n' +*/}}
+{{/*            '                    </div>\n' +*/}}
+{{/*            '                </div>\n' +*/}}
+{{/*            '                <div class="login-button" onclick="loginAjax()">\n' +*/}}
+{{/*            '                    登陆\n' +*/}}
+{{/*            '                </div>'+*/}}
+{{/*            '                <div><a onclick="retrievepass()" style="margin-top:15px;margin-right: 51px;float: right;font-size: 12px;cursor:pointer;">重置密码</a></div>';*/}}
 
 
-    function again(v) {
-        if(v==1){
-            logotmp=0;
-            verification = false;
-            $('#mpanel1').html('');
-            $('#mpanel1').slideVerify({
-                type : 1,		//类型
-                vOffset : 5,	//误差量，根据需求自行调整
-                barSize : {
-                    width : '100%',
-                    height : '40px',
-                },
-                ready : function() {
-                },
-                success : function() {
-                    verification = true;
-                    var myDate = new Date();
-                    var tmp = Number(myDate.getMinutes()+''+myDate.getSeconds());
-                    logotmp = (tmp-500+1+2+3-4);
-                    $.ajax({
-                        type: "POST",
-                        url: "/user/verification",
-                        data:{tmp:logotmp,type:1},
-                        dataType: "json",
-                        success: function (data) {}
-                    });
-                },
-                error : function() {}
-            });
-        }
-        if(v==2){
-            zctmp=0;
-            zcverification = false;
-            $('#mpanel2').html('');
-            $('#mpanel2').slideVerify({
-                type : 1,		//类型
-                vOffset : 5,	//误差量，根据需求自行调整
-                barSize : {
-                    width : '100%',
-                    height : '40px',
-                },
-                ready : function() {
-                },
-                success : function() {
-                    verification = true;
-                    var myDate = new Date();
-                    var tmp = Number(myDate.getMinutes()+''+myDate.getSeconds());
-                    zctmp = (tmp-500+1+2+3-4);
-                    $.ajax({
-                        type: "POST",
-                        url: "/user/verification",
-                        data:{tmp:zctmp,type:2},
-                        dataType: "json",
-                        success: function (data) {}
-                    });
-                },
-                error : function() {}
-            });
-        }
-    }
 
-    function bodys() {
-        var h = '<li class="nav-item"><a style="color: #f5f5f5;cursor: pointer;" target="_blank" href="/system" class="nav-link page-scroll d-flex flex-row align-items-center md-trigger"> <em data-feather="tool" width="18" height="18" class="mr-2"></em>控制台</a></li>';
-        var h1 = '<li class="nav-item"><a style="color: #f5f5f5;cursor: pointer;" target="_blank" onclick="exit()" class="nav-link page-scroll d-flex flex-row align-items-center md-trigger"> <em data-feather="x-square" width="18" height="18" class="mr-2"></em>退出</a></li>';
-        // $("#usersrc").html(h3 + h + h1 );
-        $("#usersrc").html( h + h1 );
-        feather.replace();
-    }
+{{/*        $('.login').html(html);*/}}
+{{/*        $('#zhezhao').show();*/}}
+{{/*        $('.login').show();*/}}
+{{/*        $('.login').addClass('animated  slideInDown');*/}}
+{{/*        $('body').css({*/}}
+{{/*            "overflow-x":"hidden",*/}}
+{{/*            "overflow-y":"hidden"*/}}
+{{/*        });*/}}
+{{/*        initSlideVerify(1);*/}}
+{{/*    }*/}}
 
-    function exit() {
-        $.ajax({
-            type: "POST",
-            url: "/logout",
-            dataType: "json",
-            success: function (data) {
-                $.cookie('name_hellohaobycookie', null);
-                $.cookie('pass_hellohaobycookie', null);
-                layer.msg('账号已退出', {icon: 1});
-                setTimeout(function () {
-                    window.location.reload();
-                },1500)
-            }
-        });
-    }
+{{/*    function toregister() {*/}}
+{{/*        var html = '<p style="display: block;float: right;margin-top: 5px; cursor:pointer;margin-right: 13px;font-size: 24px;" onclick="Closelogin()">×</p>\n' +*/}}
+{{/*            '            <div class="login-top" style="margin-top: 50px;">\n' +*/}}
+{{/*            '                注册\n' +*/}}
+{{/*            '            </div>\n' +*/}}
+{{/*            '            <p align="center" style="color: #db5860;margin-top: -40px;" id="zcts"></p>\n' +*/}}
+{{/*            '            <div class="login-center clearfix">\n' +*/}}
+{{/*            //'                <div class="login-center-img"><img th:src="@{/img/name.png}"/></div>\n' +*/}}
+{{/*            '                <div class="login-center-input">\n' +*/}}
+{{/*            '                    <input type="text" id="registerusername" name="username" value="" placeholder="用户名(数字/字母不得超过10位)" onfocus="this.placeholder=\'\'" onblur="this.placeholder=\'用户名(数字/字母不得超过10位)\'"/>\n' +*/}}
+{{/*            '                    <div class="login-center-input-text">用户名</div>\n' +*/}}
+{{/*            '                </div>\n' +*/}}
+{{/*            '            </div>\n' +*/}}
+{{/*            '            <div class="login-center clearfix">\n' +*/}}
+{{/*            //'                <div class="login-center-img"><img th:src="@{/img/name.png}"/></div>\n' +*/}}
+{{/*            '                <div class="login-center-input">\n' +*/}}
+{{/*            '                    <input type="text" id="registeremail" name="email" value="" placeholder="待验证的邮箱" onfocus="this.placeholder=\'\'" onblur="this.placeholder=\'待验证的邮箱\'"/>\n' +*/}}
+{{/*            '                    <div class="login-center-input-text">邮箱</div>\n' +*/}}
+{{/*            '                </div>\n' +*/}}
+{{/*            '            </div>\n' +*/}}
+{{/*            '            <div class="login-center clearfix">\n' +*/}}
+{{/*            //'                <div class="login-center-img"><img th:src="@{/img/password.png}"/></div>\n' +*/}}
+{{/*            '                <div class="login-center-input">\n' +*/}}
+{{/*            '                    <input type="password" id="registerpassword" name="password" value="" placeholder="请输入您的密码" onfocus="this.placeholder=\'\'" onblur="this.placeholder=\'请输入您的密码\'"/>\n' +*/}}
+{{/*            '                    <div class="login-center-input-text">密码</div>\n' +*/}}
+{{/*            '                </div>\n' +*/}}
+{{/*            '            </div>\n' +*/}}
+{{/*            '            <div class="login-center clearfix">\n' +*/}}
+{{/*            //'                <div class="login-center-img"><img th:src="@{/img/password.png}"/></div>\n' +*/}}
+{{/*            '                <div class="login-center-input">\n' +*/}}
+{{/*            '                    <input type="password" id="registerpassword_confirmation" name="password" value="" placeholder="请输入您的密码" onfocus="this.placeholder=\'\'" onblur="this.placeholder=\'请输入您的密码\'"/>\n' +*/}}
+{{/*            '                    <div class="login-center-input-text">密码</div>\n' +*/}}
+{{/*            '                </div>\n' +*/}}
+{{/*            '            </div>\n' +*/}}
+{{/*            '            <div class="login-center clearfix">\n' +*/}}
+{{/*            '                <div style="width: 280px;height: 50px;">\n' +*/}}
+{{/*            '                    <div id="mpanel2" onselectstart="return true"></div>\n' +*/}}
+{{/*            '                </div>\n' +*/}}
+{{/*            '            </div>\n' +*/}}
+{{/*            '            <div class="login-button" onclick="ismail();">\n' +*/}}
+{{/*            '                注册\n' +*/}}
+{{/*            '            </div>';*/}}
 
-    function zhuce(mail, registerusername, registerpassword) {
-        if(zcverification){
-            //验证成功
-            $.ajax({
-                type: "POST",
-                url: "/register",
-                data: {email: mail, username: registerusername, password: registerpassword,zctmp:zctmp},
-                dataType: "json",
-                success: function (data) {
-                    if (data.ret > 0) {
-                        $("#zctishi").text('注册成功');
-                        if (data.zctype == 1) {
-                            layer.alert('注册成功，请前往邮箱激活你的账号，注意！激活邮件如果迟迟未收到，有可能在您的【垃圾箱】中。', {
-                                skin: 'layui-layer-molv'
-                                ,closeBtn: 0
-                                ,anim: 1
-                                ,btn: ['确定']
-                                ,icon: 1
-                                ,yes:function(){
-                                    window.location.reload();
-                                }
-                            });
-                        } else {
-                            layer.alert('注册成功，快去登录体验吧。', {
-                                skin: 'layui-layer-molv'
-                                ,closeBtn: 0
-                                ,anim: 1
-                                ,btn: ['确定']
-                                ,icon: 1
-                                ,yes:function(){
-                                    window.location.reload();
-                                }
-                            });
-                        }
-                    } else {
-                        if (data.ret == -2) {
-                            layer.alert('注册失败，用户名或邮箱重复且用户名只能为字母数字，请重试。', {
-                                skin: 'layui-layer-molv'
-                                ,closeBtn: 0
-                                ,anim: 1
-                                ,btn: ['确定']
-                                ,icon: 2
-                            });
-                        } else if(data.ret == -3){
-                            layer.alert('本站关闭了注册功能。', {
-                                skin: 'layui-layer-molv'
-                                ,closeBtn: 0
-                                ,anim: 1
-                                ,btn: ['确定']
-                                ,icon: 2
-                            });
-                        }else if(data.ret == -4){
-                            layer.alert('非法注册，请刷新页面后重新尝试。', {
-                                skin: 'layui-layer-molv'
-                                ,closeBtn: 0
-                                ,anim: 1
-                                ,btn: ['确定']
-                                ,icon: 2
-                            });
-                        }else {
-                            layer.alert('注册失败，请重试。', {
-                                skin: 'layui-layer-molv'
-                                ,closeBtn: 0
-                                ,anim: 1
-                                ,btn: ['确定']
-                                ,icon: 2
-                            });
-                        }
-                        setTimeout(function () {
-                        }, 2000);
-                    }
-                    again(2);
-                    $("#userzc").css('display','block');
-                    $("#zctishi").css('display','none');
-                }
-            });
-        }else{
-            shakeModal(6);
-            $("#userzc").css('display','block');
-            $("#zctishi").css('display','none');
-        }
-    }
+{{/*        $('.login').html(html);*/}}
+{{/*        $('#zhezhao').show();*/}}
+{{/*        $('.login').show();*/}}
+{{/*        $('.login').addClass('animated  slideInDown');*/}}
+{{/*        $('body').css({*/}}
+{{/*            "overflow-x":"hidden",*/}}
+{{/*            "overflow-y":"hidden"*/}}
+{{/*        });*/}}
+{{/*        initSlideVerify(2);*/}}
+{{/*    }*/}}
 
-    $('.imgurltype').click(function () {
-        $('.imgurltype').removeClass('layui-this');
-        $(this).addClass('layui-this');
-    });
+{{/*    function Closelogin() {*/}}
+{{/*        $('#zhezhao').hide();*/}}
+{{/*        $('.login').hide();*/}}
+{{/*        $('.registers').hide();*/}}
+{{/*        $('body').css({*/}}
+{{/*            "overflow-x":"auto",*/}}
+{{/*            "overflow-y":"auto"*/}}
+{{/*        });*/}}
+{{/*    }*/}}
 
-    function imgurltype(v) {
-        if(v==1){
-            $("#imgurls").html(arr_imgurl);
-        }else if(v==2){
-            $("#imgurls").html(arr_markdown);
-        }else if(v==3){
-            $("#imgurls").html(arr_html);
-        }else{
-            $("#imgurls").html(arr_ddcode);
-        }
-    }
+{{/*    function imgsc() {*/}}
+{{/*        var str = '输入图片URL地址：';*/}}
+{{/*        if(isday>0){*/}}
+{{/*            str = '输入图片URL地址：('+isday+'天后将会自动销毁)';*/}}
+{{/*        }*/}}
+{{/*        swal(str, {*/}}
+{{/*            content: "input",*/}}
+{{/*        })*/}}
+{{/*            .then((value) => {*/}}
+{{/*                var result =value;*/}}
+{{/*                if(result!=null && result!="" ){*/}}
+{{/*                    urlimg(result);*/}}
+{{/*                }*/}}
+{{/*            });*/}}
+{{/*    }*/}}
+{{/*    function urlimg(result) {*/}}
+{{/*        if(result) {*/}}
+{{/*            var rx=/^https?:\/\//i;*/}}
+{{/*            if(rx.test(result)==true){*/}}
+{{/*                var msgid = layer.msg('上传中..', {*/}}
+{{/*                    icon: 16*/}}
+{{/*                    ,shade: 0.01*/}}
+{{/*                });*/}}
+{{/*                $('#loadingModal').modal({backdrop: 'static', keyboard: false,upurlk:qq});*/}}
+{{/*                $.ajax({*/}}
+{{/*                    type: "POST",*/}}
+{{/*                    url: "/upurlimg",*/}}
+{{/*                    dataType: "json",*/}}
+{{/*                    data: {imgurl: result,setday:isday,upurlk:qq},*/}}
+{{/*                    success: function (data) {*/}}
+{{/*                        layer.close(msgid);*/}}
+{{/*                        if(data.code=='4006'){*/}}
+{{/*                            $('#loadingModal').modal('hide');*/}}
+{{/*                            swal('上传失败', '图片超出上传大小限制');*/}}
+{{/*                        }*/}}
+{{/*                        else if(data.code=='4005'){*/}}
+{{/*                            $('#loadingModal').modal('hide');*/}}
+{{/*                            swal('上传失败', '可用空间不足');*/}}
+{{/*                        }*/}}
+{{/*                        else if(data.code=='4000'){*/}}
+{{/*                            $('#loadingModal').modal('hide');*/}}
+{{/*                            swal('上传失败', '文件类型不符合要求');*/}}
+{{/*                        }else if(data.code=='4003'){*/}}
+{{/*                            $('#loadingModal').modal('hide');*/}}
+{{/*                            swal('非法调用，请刷新页面后重试');*/}}
+{{/*                        }else if(data.code==911){*/}}
+{{/*                            $('#loadingModal').modal('hide');*/}}
+{{/*                            swal('你目前不能上传图片,请联系管理员');*/}}
+{{/*                        }else if(data.code=='1000'){*/}}
+{{/*                            $('#loadingModal').modal('hide');*/}}
+{{/*                            swal('上传失败，管理员已经关闭你的上传功能');*/}}
+{{/*                        }else{*/}}
+{{/*                            for(var i=0;i<data.data.length;i++){*/}}
+{{/*                                $('#loadingModal').modal('hide');*/}}
+{{/*                                swal('上传成功', '该图片链接已成功上传');*/}}
+{{/*                                $("#address").css('display', 'block');*/}}
+{{/*                                $("#updateurl").show();*/}}
+{{/*                                arr_url += data.data[i] + '\r\n';*/}}
+{{/*                                arr_imgurl += '<li onclick="copyimgurl(this)" class="copyimgurl"><span class="line"></span><i class="icon fab fa-gg"></i><p class="fontstyle" >'+data.data[i]+ '</p></li>';*/}}
+{{/*                                arr_markdown += '<li onclick="copyimgurl(this)" class="copyimgurl "><span class="line"></span><i class="icon fab fa-gg"></i><p class="fontstyle">'+'![image](data.data[i])</p></li>';*/}}
+{{/*                                arr_html += '<li onclick="copyimgurl(this)" class="copyimgurl "><span class="line"></span><i class="icon fab fa-gg"></i><p class="fontstyle">'+'&lt;img src="' + data.data[i] + '" alt="image" /&gt; </p></li>';*/}}
+{{/*                                arr_ddcode +='<li onclick="copyimgurl(this)" class="copyimgurl"><span class="line"></span><i class="icon fab fa-gg"></i><p class="fontstyle">'+'[img]'+data.data[i]+'[/img]</p></li>';*/}}
+{{/*                                if(urltypes==1){*/}}
+{{/*                                    $("#imgurls").html(arr_imgurl);*/}}
+{{/*                                }else if(urltypes==2){*/}}
+{{/*                                    $("#imgurls").html(arr_markdown);*/}}
+{{/*                                }else if(urltypes==3){*/}}
+{{/*                                    $("#imgurls").html(arr_html);*/}}
+{{/*                                }else{*/}}
+{{/*                                    $("#imgurls").html(arr_ddcode);*/}}
+{{/*                                }*/}}
+{{/*                            }*/}}
+{{/*                        }*/}}
+{{/*                    }*/}}
+{{/*                });*/}}
+{{/*            }else{layer.close(msgid);Popups('网址格式错误','网址必须以http(s)://开头。','error');}*/}}
+{{/*        }*/}}
+{{/*    }*/}}
 
-    function copyimgurl(t) {
-        var data = $(t).children('p').text();
-        var copy = new ClipboardJS('.copyimgurl', {
-            text: function (trigger) {
-                return  data;
-            }
-        });
-        copy.on('success', function (e) {
-            layer.msg('复制成功');
-            copy.off("success");
-        });
-        copy.on('error', function (e) {
-            layer.msg("复制失败");
-            copy.off("error");
-        });
-    }
+{{/*    function setday() {*/}}
+{{/*        swal("输入图片期限（天）,到期自动销毁图片,最高365天：\n(输入0为永久保存)", {*/}}
+{{/*            content: "input",*/}}
+{{/*            html: true,*/}}
+{{/*        })*/}}
+{{/*            .then((value) => {*/}}
+{{/*                var result =value;*/}}
+{{/*                var reg=/^[0-9]\d*$/;*/}}
+{{/*                if(result!=null && result!="" ){*/}}
+{{/*                    if(reg.test(result)){*/}}
+{{/*                        if(result<=365){*/}}
+{{/*                            isday = result;*/}}
+{{/*                            // 初始化以后添加*/}}
+{{/*                            uploader.options.formData.setday = isday;*/}}
+{{/*                        }else{*/}}
+{{/*                            swal('输入天数有误，最大不可超过365天');*/}}
+{{/*                        }*/}}
+{{/*                    }else{*/}}
+{{/*                        swal('输入格式不正确，只可输入0-9之间正整数');*/}}
+{{/*                    }*/}}
+{{/*                }*/}}
+{{/*                if(isday>0){*/}}
+{{/*                    $('#setday').text(isday+'天后销毁');*/}}
+{{/*                }else{*/}}
+{{/*                    $('#setday').text('图片期限');*/}}
+{{/*                }*/}}
+{{/*            });*/}}
+{{/*    }*/}}
+{{/*    function keyLogin(){*/}}
+{{/*        if (event.keyCode==13)*/}}
+{{/*            document.getElementById("dl").click();*/}}
+{{/*    }*/}}
 
-    var win = null;
-    function anniu(){
-        if(arr_html!=null && arr_html!=""){
-            win = layer.open({
-                title:'画廊分享',
-                type: 2,
-                area: ['870px', '500px'],
-                fixed: false, //不固定
-                maxmin: true,
-                content: '/addalbum'
-            });
-        }else{
-            layer.msg('请先上传图片后再生成画廊', {icon: 7});
-        }
+{{/*    function loginAjax() {*/}}
+{{/*        var loginemail = $("#loginemail").val();*/}}
+{{/*        var loginpassword = $("#loginpassword").val();*/}}
+{{/*        if(verification){*/}}
+{{/*            //验证成功*/}}
+{{/*            $.ajax({*/}}
+{{/*                type: "POST",*/}}
+{{/*                url: "/login",*/}}
+{{/*                data: {username: loginemail, password: loginpassword,logotmp:logotmp},*/}}
+{{/*                dataType: "json",*/}}
+{{/*                success: function (data) {*/}}
+{{/*                    console.log(data.resultCode);*/}}
+{{/*                    $('#loginModal').modal('hide');*/}}
+{{/*                    if (data.resultCode == 200) {*/}}
+{{/*                        Closelogin();*/}}
+{{/*                        layer.msg('登录成功', {icon: 1});*/}}
+{{/*                        setTimeout(function () {*/}}
+{{/*                            bodys();*/}}
+{{/*                            window.location.reload();*/}}
+{{/*                        }, 1000);*/}}
+{{/*                    } else {*/}}
+{{/*                        if (data.resultCode == -1) {*/}}
+{{/*                            //$('#dlts').text('您的账号是未激活状态，无法登陆。');*/}}
+{{/*                            layer.msg('此账号是未激活状态，无法登陆', {icon: 4});*/}}
+{{/*                            again(1);*/}}
+{{/*                        } else if(data.resultCode==-2){*/}}
+{{/*                            //$('#dlts').text('您的账号已被冻结。');*/}}
+{{/*                            layer.msg('您的账号处于冻结状态', {icon: 2});*/}}
+{{/*                            again(1);*/}}
+{{/*                        }else if(data.resultCode==-3){*/}}
+{{/*                            //$('#dlts').text('非法登录，请刷新页面重新尝试。');*/}}
+{{/*                            layer.msg('非法登录，请刷新页面重新尝试', {icon: 2});*/}}
+{{/*                            again(1);*/}}
+{{/*                        }*/}}
+{{/*                        else {*/}}
+{{/*                            //$('#dlts').text('登录失败，你的邮箱或密码不正确，请重试。');*/}}
+{{/*                            layer.msg('登录失败，账号或者密码不正确', {icon: 2});*/}}
+{{/*                            again(1);*/}}
+{{/*                        }*/}}
+{{/*                        setTimeout(function () {*/}}
+{{/*                            //window.location.reload();*/}}
+{{/*                        }, 2000);*/}}
+{{/*                    }*/}}
+{{/*                }*/}}
+{{/*            });*/}}
+{{/*        }else{*/}}
+{{/*            //$('#dlts').text('请滑动验证码进行验证，才可登录。');*/}}
+{{/*            layer.msg('请滑动验证码进行验证，才可登录。', {icon: 2});*/}}
+{{/*        }*/}}
+{{/*    }*/}}
 
-        if($(window).width()<=880){
-            layer.full(win);
-        }
-    }
+{{/*    function initSlideVerify(v) {*/}}
+{{/*        if(v==1){*/}}
+{{/*            $('#mpanel1').slideVerify({*/}}
+{{/*                type : 1,		//类型*/}}
+{{/*                vOffset : 5,	//误差量，根据需求自行调整*/}}
+{{/*                barSize : {*/}}
+{{/*                    width : '100%',*/}}
+{{/*                    height : '40px',*/}}
+{{/*                },*/}}
+{{/*                ready : function() {*/}}
+{{/*                },*/}}
+{{/*                success : function() {*/}}
+{{/*                    verification = true;*/}}
+{{/*                    var myDate = new Date();*/}}
+{{/*                    var tmp = Number(myDate.getMinutes()+''+myDate.getSeconds());*/}}
+{{/*                    logotmp = (tmp-500+1+2+3-4);*/}}
+{{/*                    $.ajax({*/}}
+{{/*                        type: "POST",*/}}
+{{/*                        url: "/user/verification",*/}}
+{{/*                        data:{tmp:logotmp,type:1},*/}}
+{{/*                        dataType: "json",*/}}
+{{/*                        success: function (data) {}*/}}
+{{/*                    });*/}}
+{{/*                },*/}}
+{{/*                error : function() {}*/}}
+{{/*            });*/}}
+{{/*        }else{*/}}
+{{/*            $('#mpanel2').slideVerify({*/}}
+{{/*                type : 1,		//类型*/}}
+{{/*                vOffset : 5,	//误差量，根据需求自行调整*/}}
+{{/*                barSize : {*/}}
+{{/*                    width : '100%',*/}}
+{{/*                    height : '40px',*/}}
+{{/*                },*/}}
+{{/*                ready : function() {*/}}
+{{/*                },*/}}
+{{/*                success : function() {*/}}
+{{/*                    zcverification = true;*/}}
+{{/*                    var myDate = new Date();*/}}
+{{/*                    var tmp = Number(myDate.getMinutes()+''+myDate.getSeconds());*/}}
+{{/*                    zctmp = (tmp-500+1+2+3-4);*/}}
+{{/*                    $.ajax({*/}}
+{{/*                        type: "POST",*/}}
+{{/*                        url: "/user/verification",*/}}
+{{/*                        data:{tmp:zctmp,type:2},*/}}
+{{/*                        dataType: "json",*/}}
+{{/*                        success: function (data) {}*/}}
+{{/*                    });*/}}
+{{/*                },*/}}
+{{/*                error : function() {}*/}}
+{{/*            });*/}}
+{{/*        }*/}}
+{{/*    }*/}}
 
-    //浏览器窗口大小变化时
-    $(window).resize(function() {
-        if(win!=null){
-            var window_width = $(window).width();//获取浏览器窗口宽度
-            var window_height = $(window).height();//获取浏览器窗口高度
-            if(window_width<880){
-                layer.full(win);
-            }
-        }
-    });
 
-    function Popup(url,pass) {
-        layer.close(win);
-        if(pass==null || pass==''){
-            pass = '无'
-        }
-        var imgbase64 = jrQrcode.getQrBase64(url);
-        var body = '<div class="layui-row">\n' +
-            '<form class="layui-form" action="">\n' +
-            '<div class="layui-form-item" style="width: 80%;margin: 20px auto;">\n' +
-            '<div class="layui-input-block" style="margin-left: 0px;">\n' +
-            '<input id="albumurl" value="'+url+'" style="color:#999;border-radius:5px;border:1px #999 solid;" readonly="readonly" type="text" name="title" lay-verify="title"  class="layui-input">\n' +
-            '</div>\n' +
-            '<div class="layui-form-mid "style="width:100%;text-align: center;color: #999999;font-weight: 500;">画廊密码：<span id="ckey" style="font-weight: 600;">'+pass+'</span><button onclick="copyurl()" style="margin-left: 50px;" type="button" class="copyurl layui-btn layui-btn-sm layui-btn-normal">复制链接及密码</button></div>\n' +
-            '</div>\n' +
-            '</form>\n' +
-            '</div>\n' +
-            '<div class="layui-row">\n' +
-            '<div align="center"><img style="width: 150px;" src="'+imgbase64+'" /><p style="font-size: 12px;color: #999999;">将二维码分享给好友</p><p style="font-size: 12px;color: #999999;">对方通过扫码即可查看相册</p></div>\n' +
-            '</div>';
-        layer.open({
-            type: 1,
-            title:'画廊分享链接',
-            area: ['520px', '400px'], //宽高
-            //skin: 'layui-layer-demo', //样式类名
-            closeBtn: 1, //不显示关闭按钮
-            anim: 2,
-            shadeClose: false, //开启遮罩关闭
-            content: body
-        });
-    }
-    function copyurl() {
-        var data = "";
-        var k = $('#ckey').text();
-        var u = $('#albumurl').val();
-        if(k=='无'){
-            data = '画廊链接：'+u+ ' 复制这段内容后用浏览器打开，即可查看画廊哦';
-        }else{
-            data = '画廊链接：'+u+' 提取码：'+k+ ' 复制这段内容后用浏览器打开，即可查看画廊哦';
-        }
-        var copy = new ClipboardJS('.copyurl', {
-            text: function (trigger) {
-                return  data;
-            }
-        });
-        copy.on('success', function (e) {
-            layer.msg('复制成功');
-            copy.off("success");
-        });
-        copy.on('error', function (e) {
-            layer.msg("复制失败");
-            copy.off("error");
-        });
-    }
+{{/*    function again(v) {*/}}
+{{/*        if(v==1){*/}}
+{{/*            logotmp=0;*/}}
+{{/*            verification = false;*/}}
+{{/*            $('#mpanel1').html('');*/}}
+{{/*            $('#mpanel1').slideVerify({*/}}
+{{/*                type : 1,		//类型*/}}
+{{/*                vOffset : 5,	//误差量，根据需求自行调整*/}}
+{{/*                barSize : {*/}}
+{{/*                    width : '100%',*/}}
+{{/*                    height : '40px',*/}}
+{{/*                },*/}}
+{{/*                ready : function() {*/}}
+{{/*                },*/}}
+{{/*                success : function() {*/}}
+{{/*                    verification = true;*/}}
+{{/*                    var myDate = new Date();*/}}
+{{/*                    var tmp = Number(myDate.getMinutes()+''+myDate.getSeconds());*/}}
+{{/*                    logotmp = (tmp-500+1+2+3-4);*/}}
+{{/*                    $.ajax({*/}}
+{{/*                        type: "POST",*/}}
+{{/*                        url: "/user/verification",*/}}
+{{/*                        data:{tmp:logotmp,type:1},*/}}
+{{/*                        dataType: "json",*/}}
+{{/*                        success: function (data) {}*/}}
+{{/*                    });*/}}
+{{/*                },*/}}
+{{/*                error : function() {}*/}}
+{{/*            });*/}}
+{{/*        }*/}}
+{{/*        if(v==2){*/}}
+{{/*            zctmp=0;*/}}
+{{/*            zcverification = false;*/}}
+{{/*            $('#mpanel2').html('');*/}}
+{{/*            $('#mpanel2').slideVerify({*/}}
+{{/*                type : 1,		//类型*/}}
+{{/*                vOffset : 5,	//误差量，根据需求自行调整*/}}
+{{/*                barSize : {*/}}
+{{/*                    width : '100%',*/}}
+{{/*                    height : '40px',*/}}
+{{/*                },*/}}
+{{/*                ready : function() {*/}}
+{{/*                },*/}}
+{{/*                success : function() {*/}}
+{{/*                    verification = true;*/}}
+{{/*                    var myDate = new Date();*/}}
+{{/*                    var tmp = Number(myDate.getMinutes()+''+myDate.getSeconds());*/}}
+{{/*                    zctmp = (tmp-500+1+2+3-4);*/}}
+{{/*                    $.ajax({*/}}
+{{/*                        type: "POST",*/}}
+{{/*                        url: "/user/verification",*/}}
+{{/*                        data:{tmp:zctmp,type:2},*/}}
+{{/*                        dataType: "json",*/}}
+{{/*                        success: function (data) {}*/}}
+{{/*                    });*/}}
+{{/*                },*/}}
+{{/*                error : function() {}*/}}
+{{/*            });*/}}
+{{/*        }*/}}
+{{/*    }*/}}
 
-    function retrievepass() {
-        Closelogin();
-        swal("请输入您的注册邮箱进行密码重置：\n(验证后密码将重置为’123456‘)", {
-            content: "input",
-            html: true,
-        })
-            .then((value) => {
-                var result =value;
-                var reg=/^([a-zA-Z0-9_\.\-])+\@(([a-zA-Z0-9\-])+\.)+([a-zA-Z0-9]{2,4})+$/;
-                if(result!=null && result!="" ){
-                    if(reg.test(result)){
-                        var retrievetoken=$('#vu').val();
-                        $.ajax({
-                            type: "POST",
-                            url: "/user/retrievepass",
-                            dataType: "json",
-                            data:{email:result,retrievetoken:retrievetoken},
-                            success: function (data) {
-                                swal(data[0]);
-                            }
-                        });
-                    }else{
-                        swal('邮箱格式不正确');
-                    }
-                }
+{{/*    function bodys() {*/}}
+{{/*        var h = '<li class="nav-item"><a style="color: #f5f5f5;cursor: pointer;" target="_blank" href="/system" class="nav-link page-scroll d-flex flex-row align-items-center md-trigger"> <em data-feather="tool" width="18" height="18" class="mr-2"></em>控制台</a></li>';*/}}
+{{/*        var h1 = '<li class="nav-item"><a style="color: #f5f5f5;cursor: pointer;" target="_blank" onclick="exit()" class="nav-link page-scroll d-flex flex-row align-items-center md-trigger"> <em data-feather="x-square" width="18" height="18" class="mr-2"></em>退出</a></li>';*/}}
+{{/*        // $("#usersrc").html(h3 + h + h1 );*/}}
+{{/*        $("#usersrc").html( h + h1 );*/}}
+{{/*        feather.replace();*/}}
+{{/*    }*/}}
 
-            });
-    }
-</script>
+{{/*    function exit() {*/}}
+{{/*        $.ajax({*/}}
+{{/*            type: "POST",*/}}
+{{/*            url: "/logout",*/}}
+{{/*            dataType: "json",*/}}
+{{/*            success: function (data) {*/}}
+{{/*                $.cookie('name_hellohaobycookie', null);*/}}
+{{/*                $.cookie('pass_hellohaobycookie', null);*/}}
+{{/*                layer.msg('账号已退出', {icon: 1});*/}}
+{{/*                setTimeout(function () {*/}}
+{{/*                    window.location.reload();*/}}
+{{/*                },1500)*/}}
+{{/*            }*/}}
+{{/*        });*/}}
+{{/*    }*/}}
+
+{{/*    function zhuce(mail, registerusername, registerpassword) {*/}}
+{{/*        if(zcverification){*/}}
+{{/*            //验证成功*/}}
+{{/*            $.ajax({*/}}
+{{/*                type: "POST",*/}}
+{{/*                url: "/register",*/}}
+{{/*                data: {email: mail, username: registerusername, password: registerpassword,zctmp:zctmp},*/}}
+{{/*                dataType: "json",*/}}
+{{/*                success: function (data) {*/}}
+{{/*                    if (data.ret > 0) {*/}}
+{{/*                        $("#zctishi").text('注册成功');*/}}
+{{/*                        if (data.zctype == 1) {*/}}
+{{/*                            layer.alert('注册成功，请前往邮箱激活你的账号，注意！激活邮件如果迟迟未收到，有可能在您的【垃圾箱】中。', {*/}}
+{{/*                                skin: 'layui-layer-molv'*/}}
+{{/*                                ,closeBtn: 0*/}}
+{{/*                                ,anim: 1*/}}
+{{/*                                ,btn: ['确定']*/}}
+{{/*                                ,icon: 1*/}}
+{{/*                                ,yes:function(){*/}}
+{{/*                                    window.location.reload();*/}}
+{{/*                                }*/}}
+{{/*                            });*/}}
+{{/*                        } else {*/}}
+{{/*                            layer.alert('注册成功，快去登录体验吧。', {*/}}
+{{/*                                skin: 'layui-layer-molv'*/}}
+{{/*                                ,closeBtn: 0*/}}
+{{/*                                ,anim: 1*/}}
+{{/*                                ,btn: ['确定']*/}}
+{{/*                                ,icon: 1*/}}
+{{/*                                ,yes:function(){*/}}
+{{/*                                    window.location.reload();*/}}
+{{/*                                }*/}}
+{{/*                            });*/}}
+{{/*                        }*/}}
+{{/*                    } else {*/}}
+{{/*                        if (data.ret == -2) {*/}}
+{{/*                            layer.alert('注册失败，用户名或邮箱重复且用户名只能为字母数字，请重试。', {*/}}
+{{/*                                skin: 'layui-layer-molv'*/}}
+{{/*                                ,closeBtn: 0*/}}
+{{/*                                ,anim: 1*/}}
+{{/*                                ,btn: ['确定']*/}}
+{{/*                                ,icon: 2*/}}
+{{/*                            });*/}}
+{{/*                        } else if(data.ret == -3){*/}}
+{{/*                            layer.alert('本站关闭了注册功能。', {*/}}
+{{/*                                skin: 'layui-layer-molv'*/}}
+{{/*                                ,closeBtn: 0*/}}
+{{/*                                ,anim: 1*/}}
+{{/*                                ,btn: ['确定']*/}}
+{{/*                                ,icon: 2*/}}
+{{/*                            });*/}}
+{{/*                        }else if(data.ret == -4){*/}}
+{{/*                            layer.alert('非法注册，请刷新页面后重新尝试。', {*/}}
+{{/*                                skin: 'layui-layer-molv'*/}}
+{{/*                                ,closeBtn: 0*/}}
+{{/*                                ,anim: 1*/}}
+{{/*                                ,btn: ['确定']*/}}
+{{/*                                ,icon: 2*/}}
+{{/*                            });*/}}
+{{/*                        }else {*/}}
+{{/*                            layer.alert('注册失败，请重试。', {*/}}
+{{/*                                skin: 'layui-layer-molv'*/}}
+{{/*                                ,closeBtn: 0*/}}
+{{/*                                ,anim: 1*/}}
+{{/*                                ,btn: ['确定']*/}}
+{{/*                                ,icon: 2*/}}
+{{/*                            });*/}}
+{{/*                        }*/}}
+{{/*                        setTimeout(function () {*/}}
+{{/*                        }, 2000);*/}}
+{{/*                    }*/}}
+{{/*                    again(2);*/}}
+{{/*                    $("#userzc").css('display','block');*/}}
+{{/*                    $("#zctishi").css('display','none');*/}}
+{{/*                }*/}}
+{{/*            });*/}}
+{{/*        }else{*/}}
+{{/*            shakeModal(6);*/}}
+{{/*            $("#userzc").css('display','block');*/}}
+{{/*            $("#zctishi").css('display','none');*/}}
+{{/*        }*/}}
+{{/*    }*/}}
+
+{{/*    $('.imgurltype').click(function () {*/}}
+{{/*        $('.imgurltype').removeClass('layui-this');*/}}
+{{/*        $(this).addClass('layui-this');*/}}
+{{/*    });*/}}
+
+{{/*    function imgurltype(v) {*/}}
+{{/*        if(v==1){*/}}
+{{/*            $("#imgurls").html(arr_imgurl);*/}}
+{{/*        }else if(v==2){*/}}
+{{/*            $("#imgurls").html(arr_markdown);*/}}
+{{/*        }else if(v==3){*/}}
+{{/*            $("#imgurls").html(arr_html);*/}}
+{{/*        }else{*/}}
+{{/*            $("#imgurls").html(arr_ddcode);*/}}
+{{/*        }*/}}
+{{/*    }*/}}
+
+{{/*    function copyimgurl(t) {*/}}
+{{/*        var data = $(t).children('p').text();*/}}
+{{/*        var copy = new ClipboardJS('.copyimgurl', {*/}}
+{{/*            text: function (trigger) {*/}}
+{{/*                return  data;*/}}
+{{/*            }*/}}
+{{/*        });*/}}
+{{/*        copy.on('success', function (e) {*/}}
+{{/*            layer.msg('复制成功');*/}}
+{{/*            copy.off("success");*/}}
+{{/*        });*/}}
+{{/*        copy.on('error', function (e) {*/}}
+{{/*            layer.msg("复制失败");*/}}
+{{/*            copy.off("error");*/}}
+{{/*        });*/}}
+{{/*    }*/}}
+
+{{/*    var win = null;*/}}
+{{/*    function anniu(){*/}}
+{{/*        if(arr_html!=null && arr_html!=""){*/}}
+{{/*            win = layer.open({*/}}
+{{/*                title:'画廊分享',*/}}
+{{/*                type: 2,*/}}
+{{/*                area: ['870px', '500px'],*/}}
+{{/*                fixed: false, //不固定*/}}
+{{/*                maxmin: true,*/}}
+{{/*                content: '/addalbum'*/}}
+{{/*            });*/}}
+{{/*        }else{*/}}
+{{/*            layer.msg('请先上传图片后再生成画廊', {icon: 7});*/}}
+{{/*        }*/}}
+
+{{/*        if($(window).width()<=880){*/}}
+{{/*            layer.full(win);*/}}
+{{/*        }*/}}
+{{/*    }*/}}
+
+{{/*    //浏览器窗口大小变化时*/}}
+{{/*    $(window).resize(function() {*/}}
+{{/*        if(win!=null){*/}}
+{{/*            var window_width = $(window).width();//获取浏览器窗口宽度*/}}
+{{/*            var window_height = $(window).height();//获取浏览器窗口高度*/}}
+{{/*            if(window_width<880){*/}}
+{{/*                layer.full(win);*/}}
+{{/*            }*/}}
+{{/*        }*/}}
+{{/*    });*/}}
+
+{{/*    function Popup(url,pass) {*/}}
+{{/*        layer.close(win);*/}}
+{{/*        if(pass==null || pass==''){*/}}
+{{/*            pass = '无'*/}}
+{{/*        }*/}}
+{{/*        var imgbase64 = jrQrcode.getQrBase64(url);*/}}
+{{/*        var body = '<div class="layui-row">\n' +*/}}
+{{/*            '<form class="layui-form" action="">\n' +*/}}
+{{/*            '<div class="layui-form-item" style="width: 80%;margin: 20px auto;">\n' +*/}}
+{{/*            '<div class="layui-input-block" style="margin-left: 0px;">\n' +*/}}
+{{/*            '<input id="albumurl" value="'+url+'" style="color:#999;border-radius:5px;border:1px #999 solid;" readonly="readonly" type="text" name="title" lay-verify="title"  class="layui-input">\n' +*/}}
+{{/*            '</div>\n' +*/}}
+{{/*            '<div class="layui-form-mid "style="width:100%;text-align: center;color: #999999;font-weight: 500;">画廊密码：<span id="ckey" style="font-weight: 600;">'+pass+'</span><button onclick="copyurl()" style="margin-left: 50px;" type="button" class="copyurl layui-btn layui-btn-sm layui-btn-normal">复制链接及密码</button></div>\n' +*/}}
+{{/*            '</div>\n' +*/}}
+{{/*            '</form>\n' +*/}}
+{{/*            '</div>\n' +*/}}
+{{/*            '<div class="layui-row">\n' +*/}}
+{{/*            '<div align="center"><img style="width: 150px;" src="'+imgbase64+'" /><p style="font-size: 12px;color: #999999;">将二维码分享给好友</p><p style="font-size: 12px;color: #999999;">对方通过扫码即可查看相册</p></div>\n' +*/}}
+{{/*            '</div>';*/}}
+{{/*        layer.open({*/}}
+{{/*            type: 1,*/}}
+{{/*            title:'画廊分享链接',*/}}
+{{/*            area: ['520px', '400px'], //宽高*/}}
+{{/*            //skin: 'layui-layer-demo', //样式类名*/}}
+{{/*            closeBtn: 1, //不显示关闭按钮*/}}
+{{/*            anim: 2,*/}}
+{{/*            shadeClose: false, //开启遮罩关闭*/}}
+{{/*            content: body*/}}
+{{/*        });*/}}
+{{/*    }*/}}
+{{/*    function copyurl() {*/}}
+{{/*        var data = "";*/}}
+{{/*        var k = $('#ckey').text();*/}}
+{{/*        var u = $('#albumurl').val();*/}}
+{{/*        if(k=='无'){*/}}
+{{/*            data = '画廊链接：'+u+ ' 复制这段内容后用浏览器打开，即可查看画廊哦';*/}}
+{{/*        }else{*/}}
+{{/*            data = '画廊链接：'+u+' 提取码：'+k+ ' 复制这段内容后用浏览器打开，即可查看画廊哦';*/}}
+{{/*        }*/}}
+{{/*        var copy = new ClipboardJS('.copyurl', {*/}}
+{{/*            text: function (trigger) {*/}}
+{{/*                return  data;*/}}
+{{/*            }*/}}
+{{/*        });*/}}
+{{/*        copy.on('success', function (e) {*/}}
+{{/*            layer.msg('复制成功');*/}}
+{{/*            copy.off("success");*/}}
+{{/*        });*/}}
+{{/*        copy.on('error', function (e) {*/}}
+{{/*            layer.msg("复制失败");*/}}
+{{/*            copy.off("error");*/}}
+{{/*        });*/}}
+{{/*    }*/}}
+
+{{/*    function retrievepass() {*/}}
+{{/*        Closelogin();*/}}
+{{/*        swal("请输入您的注册邮箱进行密码重置：\n(验证后密码将重置为’123456‘)", {*/}}
+{{/*            content: "input",*/}}
+{{/*            html: true,*/}}
+{{/*        })*/}}
+{{/*            .then((value) => {*/}}
+{{/*                var result =value;*/}}
+{{/*                var reg=/^([a-zA-Z0-9_\.\-])+\@(([a-zA-Z0-9\-])+\.)+([a-zA-Z0-9]{2,4})+$/;*/}}
+{{/*                if(result!=null && result!="" ){*/}}
+{{/*                    if(reg.test(result)){*/}}
+{{/*                        var retrievetoken=$('#vu').val();*/}}
+{{/*                        $.ajax({*/}}
+{{/*                            type: "POST",*/}}
+{{/*                            url: "/user/retrievepass",*/}}
+{{/*                            dataType: "json",*/}}
+{{/*                            data:{email:result,retrievetoken:retrievetoken},*/}}
+{{/*                            success: function (data) {*/}}
+{{/*                                swal(data[0]);*/}}
+{{/*                            }*/}}
+{{/*                        });*/}}
+{{/*                    }else{*/}}
+{{/*                        swal('邮箱格式不正确');*/}}
+{{/*                    }*/}}
+{{/*                }*/}}
+
+{{/*            });*/}}
+{{/*    }*/}}
+{{/*</script>*/}}
 {{end}}

@@ -1,11 +1,18 @@
 package main
 
 import (
+	"fmt"
+	"mybedv2/app/helper/util/snowFlake"
 	"mybedv2/app/system/model/store"
 	storeService "mybedv2/app/system/service/store"
 	"strings"
 	"testing"
 )
+
+func TestSnow(t *testing.T)  {
+	id,ts := snowFlake.Snow.GetSnowflakeId()
+	fmt.Println(id,ts)
+}
 
 func TestStore(t *testing.T) {
 	storeConf := store.GetStoreConfig("cloud_type", "cs-minio")

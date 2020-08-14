@@ -3,6 +3,7 @@ package middleware
 import (
 	"github.com/gin-gonic/gin"
 	"mybedv2/app/helper/e"
+	"mybedv2/app/system/model"
 	"mybedv2/app/system/model/site"
 	"mybedv2/app/system/model/upload"
 	"mybedv2/app/system/service/user"
@@ -42,11 +43,10 @@ func CheckConfigUpload(c *gin.Context) {
 	}
 }
 
-func CheckSiteConfig(c *gin.Context) {
-	siteEntity := new(site.Entity)
-	config := siteEntity.FindOne()
-	if config.SiteStatus == 2 {
-		c.Redirect(http.StatusFound, "/system/site_close")
+func CheckSiteReg(c *gin.Context)  {
+	site := site.FindSiteConfig()
+	if site.SiteStatus != 1{
+		c.JSON(http.StatusOK, model.RegisterResp{Ret: -3, Zctype: 2, Msg: "管理员已禁止注册"})
 		c.Abort()
 	}
 }

@@ -22,6 +22,7 @@ require (
 	github.com/mitchellh/go-homedir v1.1.0 // indirect
 	github.com/o1egl/govatar v0.3.0
 	github.com/qiniu/api.v7/v7 v7.5.0
+	github.com/rs/xid v1.2.1
 	github.com/satori/go.uuid v1.2.0 // indirect
 	github.com/smartystreets/goconvey v1.6.4 // indirect
 	github.com/tencentyun/cos-go-sdk-v5 v0.7.7

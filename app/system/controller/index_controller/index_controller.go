@@ -40,6 +40,21 @@ func Index(c *gin.Context) {
 		"storeMenu": store.GetStoreMenu()})
 }
 
+func GetIndexLine(c *gin.Context)  {
+	ls := new(model.Lines)
+	ig,_ := imgModel.GetImgNumByDay()
+	for _,v := range ig{
+		ls.Days = append(ls.Days, v.Day)
+		ls.Nums = append(ls.Nums, v.Num)
+	}
+	ug,_ := user2.GetUserIndexLine()
+	for _,v := range ug{
+		ls.UserDays = append(ls.UserDays, v.Day)
+		ls.UserNums = append(ls.UserNums, v.Num)
+	}
+	c.JSON(http.StatusOK,ls)
+}
+
 func IndexFrame(c *gin.Context) {
 	userId := user.GetUserId(c)
 	totalSize, err := imgModel.GetImgdataSize(userId)
@@ -57,10 +72,6 @@ func IndexFrame(c *gin.Context) {
 
 func PageNotFound(c *gin.Context) {
 	c.HTML(http.StatusOK, "page_not_found.html", gin.H{})
-}
-
-func SiteClose(c *gin.Context) {
-	c.HTML(http.StatusOK, "site_close.html", gin.H{})
 }
 
 func EditPwd(c *gin.Context) {

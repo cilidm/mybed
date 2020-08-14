@@ -10,8 +10,13 @@ import (
 	"os"
 	"reflect"
 	"regexp"
+	"strings"
 	"time"
 )
+
+func Struct2Str(s interface{}) string {
+	return strings.Replace(strings.Trim(fmt.Sprint(s), "[]"), " ", ",", -1)
+}
 
 func GetBase64ByFile(path string) (string, error) {
 	ff, err := os.Open(path)

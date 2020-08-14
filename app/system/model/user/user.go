@@ -44,3 +44,8 @@ type EditPwdForm struct {
 	Newpwd     string `json:"newpwd" form:"newpwd" binding:"required"`
 	Confirmpwd string `json:"confirmpwd" form:"confirmpwd" binding:"required"`
 }
+
+type IndexLine struct {
+	Day string `json:"day"`
+	Num int    `json:"num"`
+}

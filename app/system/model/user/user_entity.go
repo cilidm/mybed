@@ -1,7 +1,6 @@
 package user
 
 import (
-	"github.com/jinzhu/gorm"
 	db2 "mybedv2/app/helper/db"
 	"mybedv2/app/system/model/upload"
 	"time"
@@ -34,33 +33,24 @@ func TableName() string {
 	return "user"
 }
 
-func (e *Entity) BeforeCreate(scope *gorm.Scope) error {
-	scope.SetColumn("CreatedAt", time.Now())
-	scope.SetColumn("LastLoginTime", time.Now())
-	scope.SetColumn("Status", 1)                                    //默认创建后用户状态
-	scope.SetColumn("Avatar", "/static/admin/images/users/1_0.jpg") //默认头像
-
+func (e *Entity) Insert(user Entity) error {
+	user.CreatedAt = time.Now()
+	user.UpdatedAt = time.Now()
+	user.LastLoginTime = time.Now()
+	user.Status = 1
+	user.Avatar = "/static/admin/images/users/1_0.jpg"
 	var up upload.Entity
 	mem := up.FindOne()
 	if mem.Id > 0 && mem.MemberImgTotalSize > 0 {
-		scope.SetColumn("Memory", mem.MemberImgTotalSize) //如果已经设置过会员最大上传空间就使用设置的值
+		user.Memory = int64(mem.MemberImgTotalSize) //如果已经设置过会员最大上传空间就使用设置的值
 	} else {
-		scope.SetColumn("Memory", 100) //没设置过 默认100mb
+		user.Memory = 100 //没设置过 默认100mb
 	}
-	return nil
-}
-
-func (e *Entity) BeforeUpdate(scope gorm.Scope) error {
-	scope.SetColumn("UpdatedAt", time.Now())
-	return nil
-}
-
-func (e *Entity) Insert(user Entity) error {
 	return db.Create(&user).Error
 }
 
-func (e *Entity) Update(user Entity) {
-	db.Where("id = ?", user.ID).Omit("id").Update(&user)
+func (e *Entity) Update() {
+	db.Omit("id").Updates(e)
 }
 
 func (e *Entity) Delete(user Entity) error {
@@ -68,6 +58,15 @@ func (e *Entity) Delete(user Entity) error {
 }
 
 func (e *Entity) FindById(id int64) (user Entity, err error) {
+	err = db.Where("id = ?", id).First(&user).Error
+	return
+}
+
+func UpdateMem(user Entity) error {
+	return db.Where("id = ?",user.ID).UpdateColumns(Entity{Memory: user.Memory,UpdatedAt: time.Now()}).Error
+}
+
+func FindUserById(id int64) (user Entity, err error) {
 	err = db.Where("id = ?", id).First(&user).Error
 	return
 }
@@ -125,4 +124,9 @@ func UpdateUserAvatar(id, avatar string) {
 // 更新用户资料
 func UpdateUserProfile(id int64, email, nickname string) error {
 	return db.Where("id = ?", id).Updates(Entity{Nickname: nickname, Email: email}).Error
+}
+
+func GetUserIndexLine() (l []IndexLine,err error) {
+	err = db.Raw("select DATE_FORMAT(created_at,'%Y-%m-%d') AS day, count(*) AS num from user where (level <> 99) group by day").Scan(&l).Error
+	return
 }

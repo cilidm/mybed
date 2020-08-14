@@ -127,6 +127,11 @@ func GetImgdataSize(userId int64) (size int, err error) {
 	return
 }
 
+func GetImgNumByDay() (l []Line,err error) {
+	err = db.Raw("select DATE_FORMAT(created_at,'%m-%d') AS day, count(*) AS num from img_data group by day").Scan(&l).Error
+	return
+}
+
 func UpdateImgdataThumb(id int, thumb string) error {
 	return db.Where("id = ?", id).UpdateColumn("img_thumb", thumb).Error
 }

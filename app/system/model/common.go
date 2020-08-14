@@ -1,5 +1,12 @@
 package model
 
+type Lines struct {
+	Days     []string `json:"days"`
+	Nums     []int    `json:"nums"`
+	UserDays []string `json:"user_days"`
+	UserNums []int    `json:"user_nums"`
+}
+
 // 前端上传返回json
 type ImgInfo struct {
 	Imgnames string `json:"imgnames"`

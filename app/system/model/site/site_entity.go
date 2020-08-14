@@ -60,3 +60,8 @@ func (e *Entity) FindOne() (s Entity) {
 	db.Where("id = 1").First(&s)
 	return s
 }
+
+func FindSiteConfig() (s Entity) {
+	db.Where("id = 1").First(&s)
+	return s
+}

@@ -15,3 +15,9 @@ type List struct {
 	CreatedAt string `json:"created_at"`
 	UpdatedAt string `json:"updated_at"`
 }
+
+type Line struct {
+	Day string `json:"day"`
+	Num int    `json:"num"`
+}
+

@@ -23,7 +23,7 @@
                         <ul class="nav nav-subnav">
                             <li> <a class="multitabs"  href="/system/user_list">用户列表</a> </li>
 {{/*                            <li> <a class="multitabs"  href="lyear_ui_cards.html">分发群组</a> </li>*/}}
-                            <li> <a class="multitabs"  href="lyear_ui_grid.html">扩容码</a> </li>
+                            <li> <a class="multitabs"  href="/system/code">扩容码</a> </li>
                         </ul>
                     </li>
                     <li class="nav-item nav-item-has-subnav">
@@ -46,7 +46,7 @@
             </nav>
 
             <div class="sidebar-footer">
-                <p class="copyright">空间使用率 <a target="_blank" href="/">扩容</a></p>
+                <p class="copyright">空间使用率 <a style="cursor:pointer" onclick="useCode()"> 扩容</a></p>
                 <div class="progress">
                     <div class="progress-bar {{if gt .imgper 70}}progress-bar-danger{{end}}" role="progressbar" style="width: {{.imgper}}%;" aria-valuenow="{{.imgper}}" aria-valuemin="0" aria-valuemax="100">
                         {{.imgper}}%
