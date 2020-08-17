@@ -83,7 +83,14 @@ RedisDB =       # RedisDB
 
 ### 反馈交流
 
- **如果你遇到BUG可以在github反馈**
+**如果你遇到BUG可以在github反馈**
+
+### Store配置说明
+
+> 腾讯云Cos : 可以随便上传一张图片，然后打开图片的详情页，查看他的网址，网址的构成为：
+> `http://[存储桶名称]-[AppID].cos.[COS区域].myqcloud.com/图片名称`
+> 请求域名请填写: 
+> `http://[存储桶名称]-[AppID].cos.[COS区域].myqcloud.com/`
 
 ### 开发计划
 
@@ -92,7 +99,7 @@ RedisDB =       # RedisDB
     - [x] 七牛云
     - [x] 又拍云
     - [x] Minio
-    - [ ] 腾讯云
+    - [x] 腾讯云
     - [ ] 百度云
     - [ ] 华为云
 - [ ] 日志功能
@@ -100,3 +107,4 @@ RedisDB =       # RedisDB
 - [ ] IP黑名单拦截
 - [ ] 游客每日上传数量限制(ip统计)
 - [ ] 部分栏目增加搜索功能
+复制代码

@@ -87,11 +87,8 @@ func ImgdataDelHandler(id int, storeType string) error {
 	img := img.GetImgdataById(id)
 	storeConf := store.GetStoreConfig("cloud_type", storeType)
 	cs, _ := storeService.NewCloudStoreByConf(storeConf, false)
-	if storeType == "cs-minio" {
-		storePath = strings.ReplaceAll(img.ImgUrl, storeConf.PublicBucketDomain+storeConf.PublicBucket, "")
-	} else {
-		storePath = strings.ReplaceAll(img.ImgUrl, storeConf.PublicBucketDomain, "")
-	}
+	imgArr := strings.Split(img.ImgUrl, "/")
+	storePath = imgArr[len(imgArr)-3] + "/" + imgArr[len(imgArr)-2] + "/" + imgArr[len(imgArr)-1]
 	if err := cs.Delete(storePath); err != nil {
 		return err
 	}

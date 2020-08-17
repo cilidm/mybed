@@ -1,6 +1,5 @@
 package index_controller
 
-import "C"
 import (
 	"fmt"
 	"github.com/gin-gonic/gin"
@@ -40,19 +39,19 @@ func Index(c *gin.Context) {
 		"storeMenu": store.GetStoreMenu()})
 }
 
-func GetIndexLine(c *gin.Context)  {
+func GetIndexLine(c *gin.Context) {
 	ls := new(model.Lines)
-	ig,_ := imgModel.GetImgNumByDay()
-	for _,v := range ig{
+	ig, _ := imgModel.GetImgNumByDay()
+	for _, v := range ig {
 		ls.Days = append(ls.Days, v.Day)
 		ls.Nums = append(ls.Nums, v.Num)
 	}
-	ug,_ := user2.GetUserIndexLine()
-	for _,v := range ug{
+	ug, _ := user2.GetUserIndexLine()
+	for _, v := range ug {
 		ls.UserDays = append(ls.UserDays, v.Day)
 		ls.UserNums = append(ls.UserNums, v.Num)
 	}
-	c.JSON(http.StatusOK,ls)
+	c.JSON(http.StatusOK, ls)
 }
 
 func IndexFrame(c *gin.Context) {

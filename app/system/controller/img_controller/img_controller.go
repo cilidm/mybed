@@ -90,11 +90,8 @@ func DelImgDomain(v img.Entity) error {
 		return err
 	}
 	var file string
-	if cloudType == "cs-minio" {
-		file = strings.ReplaceAll(v.ImgUrl, csc.PublicBucketDomain+csc.PublicBucket, "")
-	} else {
-		file = strings.ReplaceAll(v.ImgUrl, csc.PublicBucketDomain, "")
-	}
+	imgArr := strings.Split(v.ImgUrl, "/")
+	file = imgArr[len(imgArr)-3] + "/" + imgArr[len(imgArr)-2] + "/" + imgArr[len(imgArr)-1]
 	cs.Delete(file)              //删除store原图
 	err = imgEntity.Delete(v.Id) //删除数据库
 	if err != nil {

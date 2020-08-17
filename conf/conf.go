@@ -2,7 +2,12 @@ package conf
 
 import (
 	"github.com/go-ini/ini"
+	"io/ioutil"
+	"log"
+	"mybedv2/app/helper/e"
+	"mybedv2/app/helper/util/pathdir"
 	"mybedv2/app/helper/util/str"
+	"os"
 	"sync"
 	"time"
 )
@@ -40,10 +45,16 @@ type SettingConf struct {
 }
 
 func init() {
+	iniPath := "conf/app.ini"
 	once.Do(func() {
 		var err error
-		Cfg, err = ini.Load("conf/app.ini")
-		str.CheckErr(err, "读取配置文件出错")
+		Cfg, err = ini.Load(iniPath)
+		if err != nil {
+			pathdir.PathExists("conf/")
+			pathdir.CreateFile(iniPath)
+			createIni(iniPath)
+			os.Exit(-1)
+		}
 		err = Cfg.Section("runMode").MapTo(Setting)
 		str.CheckErr(err, "映射配置文件出错，请检查runMode配置")
 		err = Cfg.Section("app").MapTo(Setting)
@@ -59,4 +70,13 @@ func init() {
 		Setting.ReadTimeout = time.Duration(server.ReadTimeout) * time.Second
 		Setting.WriteTimeout = time.Duration(server.WriteTimeout) * time.Second
 	})
+}
+
+func createIni(path string) {
+	ini := e.IniStr
+	if err := ioutil.WriteFile(path, []byte(ini), os.ModePerm); err != nil {
+		log.Println("写入默认配置信息失败，请手动创建")
+	} else {
+		log.Println("写入配置信息完毕，请重新启动")
+	}
 }
