@@ -1,0 +1,168 @@
+<!DOCTYPE html>
+<html>
+<head>
+    <meta charset="utf-8">
+    <title>Layui</title>
+    <meta name="renderer" content="webkit">
+    <meta http-equiv="X-UA-Compatible" content="IE=edge,chrome=1">
+    <meta name="viewport" content="width=device-width, initial-scale=1, maximum-scale=1">
+    <link rel="stylesheet" href="/static/home/layui/layui/css/layui.css"  media="all">
+    {{template "layui_frame_css"}}
+</head>
+<body>
+
+<table class="layui-hide" id="test" lay-filter="test"></table>
+
+<script type="text/html" id="toolbarDemo">
+    <div class="layui-btn-container">
+        <button class="layui-btn layui-btn-sm btn-primary" lay-event="getCheckData">删除选中数据</button>
+        {{/*        <button class="layui-btn layui-btn-sm" lay-event="getCheckLength">获取选中数目</button>*/}}
+        {{/*        <button class="layui-btn layui-btn-sm" lay-event="isAll">验证是否全选</button>*/}}
+    </div>
+</script>
+
+<script type="text/html" id="barDemo">
+    <a class="copyLink layui-btn layui-btn-xs copybtn btn-primary" lay-event="copy" ><i class="layui-icon" onmouseover="layer.tips('点击复制图片链接', this, {tips: [3, '#000']});">&#xe64c;</i></a>
+    <a class="layui-btn btn-success layui-btn-xs" lay-event="show"><i class="layui-icon"  onmouseover="layer.tips('点击查看图片', this, {tips: [3, '#000']});">&#xe64a;</i></a>
+    <a class="layui-btn btn-warning layui-btn-xs" lay-event="show_qrcode"><i class="layui-icon"  onmouseover="layer.tips('点击查看图片二维码', this, {tips: [3, '#000']});">&#xe610;</i></a>
+    <a class="layui-btn btn-danger layui-btn-xs" lay-event="del"><i class="layui-icon"  onmouseover="layer.tips('点击删除图片', this, {tips: [3, '#000']});">&#xe640;</i></a>
+</script>
+
+<script type="text/javascript" src="/static/home/clipboard.min.js"></script>
+<script src="/static/home/layui/layui/layui.js" charset="utf-8"></script>
+<!-- 注意：如果你直接复制所有代码到本地，上述js路径需要改成你本地的 -->
+<script>
+    layui.use(['jquery','table'], function(){
+        var table = layui.table,
+            $ = layui.$;
+
+        table.render({
+            elem: '#test'
+            ,url:'/system/storemenu_json?type={{.type}}'
+            ,toolbar: '#toolbarDemo' //开启头部工具栏，并为其绑定左侧模板
+            ,defaultToolbar: ['filter', 'exports', 'print', { //自定义头部工具栏右侧图标。如无需自定义，去除该参数即可
+                title: '提示'
+                ,layEvent: 'LAYTABLE_TIPS'
+                ,icon: 'layui-icon-tips'
+            }]
+            ,title: '云存储列表'
+            ,cols: [[
+                {type: 'checkbox', fixed: 'left'}
+                ,{field:'Id', title:'ID', width:80, fixed: 'left', unresize: true, sort: true}
+                ,{field:'ImgName', title:'图片名称',  edit: 'text'}
+                ,{field:'CreatedAt', title:'上传日期',  edit: 'text',width: 200}
+                ,{field:'Size', title:'大小',  edit: 'text', sort: true}
+                ,{field:'Ip', title:'IP地址'}
+                ,{field:'User', title:'上传人'}
+                ,{fixed: 'right', title:'操作', toolbar: '#barDemo', width:180}
+            ]]
+            ,page: true
+        });
+
+        //头工具栏事件
+        table.on('toolbar(test)', function(obj){
+            var checkStatus = table.checkStatus(obj.config.id);
+            switch(obj.event){
+                case 'getCheckData':
+                    var index = layer.load(1, {
+                        shade: [0.3,'#000'] //0.1透明度的白色背景
+                    });
+                    var data = checkStatus.data;
+                    var ids = new Array();
+                    for(let i in data){
+                        ids.push(data[i].Id)
+                    }
+                    $.ajax({
+                        //几个参数需要注意一下
+                        type: "POST",//方法类型
+                        dataType: "json",//预期服务器返回的数据类型
+                        url: "/system/imgdata_del_more" ,//url
+                        data: {"ids":ids,"type":{{.type}}},
+                        traditional:true,
+                        success: function (result) {
+                            if (result.resultCode == 200) {
+                                layer.close(index);
+                                layer.msg('删除成功')
+                                setTimeout(function () {
+                                    location.reload();
+                                },1000)
+                            }else{
+                                layer.close(index);
+                                layer.msg(result.errorMsg);
+                            }
+                        },
+                    });
+                    break;
+                case 'getCheckLength':
+                    var data = checkStatus.data;
+                    layer.msg('选中了：'+ data.length + ' 个');
+                    break;
+                case 'isAll':
+                    layer.msg(checkStatus.isAll ? '全选': '未全选');
+                    break;
+                //自定义头工具栏右侧图标 - 提示
+                case 'LAYTABLE_TIPS':
+                    layer.alert('这是工具栏右侧自定义的一个图标按钮');
+                    break;
+            };
+        });
+
+        //监听行工具事件
+        table.on('tool(test)', function(obj){
+            var data = obj.data;
+            if(obj.event === 'del'){
+                layer.confirm('真的删除该图片吗？', function(index){
+                    $.post("/system/imgdata_del",{"id":data.Id,"type": {{.type}}},function (res) {
+                        if (res.resultCode == 200){
+                            obj.del();
+                            layer.msg(res.msg);
+                        }else{
+                            layer.msg(res.errorMsg);
+                        }
+                        // setTimeout(function () {location.reload();},1000);
+                    })
+                    layer.close(index);
+                });
+            } else if(obj.event === 'copy'){
+                var copy = new ClipboardJS('.copybtn', {
+                    text: function (trigger) {
+                        return  data.ImgUrl;
+                    }
+                });
+                copy.on('success', function (e) {
+                    layer.msg("复制成功")
+                    copy.off("success");
+                });
+                copy.on('error', function (e) {
+                    layer.msg("复制失败")
+                    copy.off("error");
+                });
+            }else if(obj.event === 'show'){
+                layer.open({
+                    type: 1,
+                    title: "",
+                    skin: 'layui-layer-demo', //样式类名
+                    closeBtn: 0, //不显示关闭按钮
+                    anim: 2,
+                    area: ['420px','420px'], //宽高
+                    shadeClose: true, //开启遮罩关闭
+                    content: "<img src='"+data.ImgUrl+"' width='100%'>"
+                });
+            }else if(obj.event === "show_qrcode"){
+                layer.open({
+                    type: 1,
+                    title: "",
+                    skin: 'layui-layer-demo', //样式类名
+                    closeBtn: 0, //不显示关闭按钮
+                    anim: 2,
+                    area: ['300px','300px'], //宽高
+                    shadeClose: true, //开启遮罩关闭
+                    content: "<img src='{{.conf.WebUrl}}system/qrcode?url="+data.ImgUrl+"' width='100%'>"
+                });
+            }
+        });
+    });
+</script>
+
+</body>
+</html>
