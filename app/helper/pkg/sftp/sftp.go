@@ -5,6 +5,7 @@ import (
 	"github.com/pkg/sftp"
 	"golang.org/x/crypto/ssh"
 	"mybedv2/app/helper/util/pathdir"
+	"mybedv2/app/system/model/img"
 	"mybedv2/app/system/model/store"
 	storeService "mybedv2/app/system/service/store"
 	"net"
@@ -119,13 +120,39 @@ func getFile(sftpClient *sftp.Client, remotePath, localPath string, uid int64, w
 	if _, err = srcFile.WriteTo(dstFile); err != nil {
 		return err
 	}
-	addStore(localPath, "/mybed/"+strconv.Itoa(int(uid)))
+	addStore(localPath, "/mybed/"+strconv.Itoa(int(uid)), uid)
 	return nil
 }
 
-func addStore(source, target string) {
+func addStore(source, target string, uid int64) {
 	stat, _ := os.Stat(source)
-	if err := cs.Upload(source, filepath.Join(target, stat.Name())); err != nil {
+	storeSavePath := filepath.Join(target, stat.Name())
+	if err := cs.Upload(source, storeSavePath); err != nil {
+		fmt.Println(err)
+		return
+	}
+	var (
+		mcPath      string
+		storeEntity store.Entity
+		imgEntity   img.Entity
+	)
+	csc := storeEntity.FindOne()
+	if csc.CloudType == "cs-minio" { //存储源minio路径需加bucket
+		mcPath = csc.PublicBucketDomain + path.Join(csc.PublicBucket, storeSavePath)
+	} else {
+		mcPath = csc.PublicBucketDomain + storeSavePath
+	}
+	md5, _ := pathdir.GetMd5V1(source)
+	defer os.Remove(source) //删除原文件
+	_, err := imgEntity.Insert(img.Entity{
+		ImgName: stat.Name(),
+		ImgUrl:  mcPath,
+		UserId:  uid,
+		Sizes:   stat.Size(),
+		Source:  store.GetStoreNum(csc.CloudType),
+		Md5:     md5,
+	})
+	if err != nil {
 		fmt.Println(err)
 		return
 	}
