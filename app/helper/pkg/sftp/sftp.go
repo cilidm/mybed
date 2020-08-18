@@ -5,12 +5,18 @@ import (
 	"github.com/pkg/sftp"
 	"golang.org/x/crypto/ssh"
 	"mybedv2/app/helper/util/pathdir"
+	"mybedv2/app/system/model/store"
+	storeService "mybedv2/app/system/service/store"
 	"net"
 	"os"
 	"path"
 	"path/filepath"
+	"strconv"
+	"sync"
 	"time"
 )
+
+var cs *store.CloudStore
 
 func connect(user, password, host string, port int) (*sftp.Client, error) {
 	var (
@@ -63,10 +69,12 @@ type Config struct {
 type SftpConf struct {
 	Source string `json:"source"`
 	Target string `json:"target"`
+	Uid    int64  `json:"uid"`
 	Config Config
 }
 
 func NewSftp(conf SftpConf) error {
+	cs, _ = storeService.NewCloudStore(false)
 	var (
 		err        error
 		sftpClient *sftp.Client
@@ -82,14 +90,51 @@ func NewSftp(conf SftpConf) error {
 	var dirName []string
 	dirPath := conf.Source
 	files, err := ShowDir(dirPath, dirName, sftpClient)
+	wg := sync.WaitGroup{}
 	for _, v := range files {
 		stat, _ := sftpClient.Stat(v)
 		if stat.IsDir() == false {
-			getFile(sftpClient, v, filepath.Join(conf.Target, stat.Name()))
+			wg.Add(1)
+			go getFile(sftpClient, v, filepath.Join(conf.Target, stat.Name()), conf.Uid, &wg)
 		}
 	}
+	wg.Wait()
 	return nil
 }
+
+func getFile(sftpClient *sftp.Client, remotePath, localPath string, uid int64, wg *sync.WaitGroup) error {
+	defer wg.Done()
+	srcFile, err := sftpClient.Open(remotePath)
+	if err != nil {
+		return err
+	}
+	defer srcFile.Close()
+	fmt.Println(srcFile.Name(), localPath)
+	dstFile, err := os.Create(localPath)
+	if err != nil {
+		return err
+	}
+	defer dstFile.Close()
+
+	if _, err = srcFile.WriteTo(dstFile); err != nil {
+		return err
+	}
+	addStore(localPath, "/mybed/"+strconv.Itoa(int(uid)))
+	return nil
+}
+
+func addStore(source, target string) {
+	stat, _ := os.Stat(source)
+	if err := cs.Upload(source, filepath.Join(target, stat.Name())); err != nil {
+		fmt.Println(err)
+		return
+	}
+}
+
+//func addRedis(uid int64) {
+//	r := redis.Client
+//	r.HSet("sftp:" + strconv.Itoa(int(uid)))
+//}
 
 func ShowDir(path string, dirName []string, client *sftp.Client) ([]string, error) {
 	dir, err := client.Stat(path)
@@ -113,26 +158,6 @@ func ShowDir(path string, dirName []string, client *sftp.Client) ([]string, erro
 		}
 	}
 	return dirName, nil
-}
-
-func getFile(sftpClient *sftp.Client, remotePath, localPath string) error {
-	srcFile, err := sftpClient.Open(remotePath)
-	if err != nil {
-		return err
-	}
-	defer srcFile.Close()
-	fmt.Println(srcFile.Name(), localPath)
-	dstFile, err := os.Create(localPath)
-	if err != nil {
-		return err
-	}
-	defer dstFile.Close()
-
-	if _, err = srcFile.WriteTo(dstFile); err != nil {
-		return err
-	}
-	//fmt.Println("copy " + srcFile.Name() + " from remote server finished!")
-	return nil
 }
 
 func uploadFile(sftpClient *sftp.Client, remoteDir, localFilePath string) error {

@@ -5,8 +5,11 @@ import (
 	"mybedv2/app/helper/e"
 	"mybedv2/app/helper/pkg/sftp"
 	"mybedv2/app/system/model"
+	"mybedv2/app/system/service/user"
 	"mybedv2/conf"
 	"net/http"
+	"path/filepath"
+	"strconv"
 )
 
 func SftpPage(c *gin.Context) {
@@ -30,8 +33,9 @@ func SftpFormHandler(c *gin.Context) {
 			Pwd:  b.Pwd,
 			Port: b.Port,
 		},
+		Uid:    user.GetUserId(c),
 		Source: b.Source,
-		Target: conf.Setting.UploadTmpDir,
+		Target: filepath.Join(conf.Setting.UploadTmpDir, "sftp_tmp/"+strconv.Itoa(int(user.GetUserId(c)))+"/"),
 	})
 	if err != nil {
 		c.JSON(http.StatusOK, model.AjaxResp{ResultCode: e.ERROR, Msg: e.GetMsg(e.ERROR)})
