@@ -1,0 +1,80 @@
+{{template "frame_top"}}
+<div class="container-fluid">
+  <div class="row">
+    <div class="card">
+      <div class="card-body">
+        <form class="form-horizontal" id="codeForm" onsubmit="return false;">
+          <div class="form-group">
+            <label class="col-md-3 control-label" for="example-hf-email">ssh账号</label>
+            <div class="col-md-7">
+              <input class="form-control" autocomplete="off" id="user" name="user" placeholder="请输入ssh账号">
+            </div>
+          </div>
+          <div class="form-group">
+            <label class="col-md-3 control-label" for="example-hf-password">ssh密码</label>
+            <div class="col-md-7">
+              <input class="form-control" autocomplete="off" id="pwd" name="pwd" placeholder="请输入ssh密码">
+            </div>
+          </div>
+          <div class="form-group">
+            <label class="col-md-3 control-label" for="example-hf-password">Host</label>
+            <div class="col-md-7">
+              <input class="form-control" autocomplete="off" id="host" name="host" placeholder="请输入ssh IP地址">
+            </div>
+          </div>
+          <div class="form-group">
+            <label class="col-md-3 control-label" for="example-hf-password">端口</label>
+            <div class="col-md-7">
+              <input class="form-control" autocomplete="off" id="port" name="port" value="22" placeholder="请输入端口,默认22">
+            </div>
+          </div>
+          <div class="form-group">
+            <label class="col-md-3 control-label" for="example-hf-password">路径</label>
+            <div class="col-md-7">
+              <input class="form-control" autocomplete="off" id="source" name="source" placeholder="请输入源文件夹路径">
+            </div>
+          </div>
+          <div class="form-group">
+            <div class="col-md-9 col-md-offset-3">
+              <button class="btn btn-primary" type="button" onclick="sub()">提交</button>
+            </div>
+          </div>
+        </form>
+
+      </div>
+    </div>
+  </div>
+</div>
+{{template "frame_js"}}
+<script src="/static/admin/js/bootstrap-notify.min.js"></script>
+<script type="text/javascript" src="/static/admin/js/lightyear.js"></script>
+<script>
+  function sub() {
+    lightyear.loading('show');  // 显示
+    $.ajax({
+      //几个参数需要注意一下
+      type: "POST",//方法类型
+      dataType: "json",//预期服务器返回的数据类型
+      url: "/system/sftp_form" ,//url
+      data: $('#codeForm').serialize(),
+      success: function (result) {
+        lightyear.loading('hide');  // 隐藏
+        if (result.resultCode == 200) {
+          lightyear.notify('执行成功~', 'success', 1000, 'mdi mdi-emoticon-happy', 'top', 'center');
+          setTimeout(function () {
+            parent.location.reload();
+          },1000)
+        }else{
+          lightyear.notify('异常！'+result.msg, 'warning', 1000, 'mdi mdi-emoticon-happy', 'top', 'center');
+        }
+      },
+      error : function(result) {
+        console.log(result.errorMsg)
+        lightyear.loading('hide');  // 隐藏
+        lightyear.notify('异常！' + result.msg, 'warning', 1000, 'mdi mdi-emoticon-happy', 'top', 'center');
+      }
+    });
+  }
+</script>
+</body>
+</html>

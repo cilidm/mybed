@@ -45,16 +45,24 @@ func connect(user, password, host string, port int) (*sftp.Client, error) {
 	return sftpClient, nil
 }
 
+type SftpBindForm struct {
+	User   string `json:"user" form:"user"`
+	Pwd    string `json:"pwd" form:"pwd"`
+	Host   string `json:"host" form:"host"`
+	Port   int    `json:"port" form:"port"`
+	Source string `json:"source" form:"source"`
+}
+
 type Config struct {
-	User string
-	Pwd  string
-	Host string
-	Port int
+	User string `json:"user"`
+	Pwd  string `json:"pwd"`
+	Host string `json:"host"`
+	Port int    `json:"port"`
 }
 
 type SftpConf struct {
-	Source string
-	Target string
+	Source string `json:"source"`
+	Target string `json:"target"`
 	Config Config
 }
 
