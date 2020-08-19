@@ -10,7 +10,6 @@ require (
 	github.com/axgle/mahonia v0.0.0-20180208002826-3358181d7394
 	github.com/baidubce/bce-sdk-go v0.9.17
 	github.com/baiyubin/aliyun-sts-go-sdk v0.0.0-20180326062324-cfa1a18b161f // indirect
-	github.com/fvbock/endless v0.0.0-20170109170031-447134032cb6
 	github.com/gin-contrib/cors v1.3.1
 	github.com/gin-contrib/sessions v0.0.3
 	github.com/gin-gonic/gin v1.6.3
@@ -18,6 +17,7 @@ require (
 	github.com/go-ini/ini v1.57.0
 	github.com/go-redis/redis v6.14.2+incompatible
 	github.com/jinzhu/gorm v1.9.15
+	github.com/koyachi/go-nude v0.0.1
 	github.com/minio/minio-go v6.0.14+incompatible
 	github.com/mitchellh/go-homedir v1.1.0 // indirect
 	github.com/o1egl/govatar v0.3.0

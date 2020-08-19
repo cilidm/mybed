@@ -87,7 +87,7 @@ func UploadImpl(files []*multipart.FileHeader, c *gin.Context) (model.UploadResp
 				fs, _ := os.Stat(fileTmpPath)
 				var blist img_blacklist.Entity
 				err := blist.Insert(img_blacklist.BindForm{
-					Info:     bdResp.ErrorMsg + bdResp.Conclusion,
+					Info:     bdResp.Conclusion + ":" + bdResp.Data[0].Msg,
 					UserIp:   c.ClientIP(),
 					UserId:   int(user.GetUserId(c)),
 					FileName: fs.Name(),
@@ -100,7 +100,6 @@ func UploadImpl(files []*multipart.FileHeader, c *gin.Context) (model.UploadResp
 				return model.UploadResp{Code: strconv.Itoa(e.ErrorUploadSave), Info: e.GetMsg(e.ErrorUploadSave)}, errors.New(bdResp.ErrorMsg + bdResp.Conclusion)
 			}
 		}
-
 		r, err := uploadSave(fileTmpPath, file.Filename, uid, c, &resp)
 		defer os.Remove(fileTmpPath)
 		if err != nil {
@@ -112,6 +111,7 @@ func UploadImpl(files []*multipart.FileHeader, c *gin.Context) (model.UploadResp
 
 func uploadSave(fileTmpPath, fileName string, uid int64, c *gin.Context, resp *model.UploadResp) (model.UploadResp, error) {
 	var imgInfo model.ImgInfo
+	defer os.Remove(fileTmpPath)
 	md5, _ := pathdir.GetMd5V1(fileTmpPath)
 	img := imgModel.GetImgdataByMd5(md5)
 	if img.Id > 0 { //已经存在同样的图片
