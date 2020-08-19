@@ -7,32 +7,39 @@
           <div class="form-group">
             <label class="col-md-3 control-label" for="example-hf-email">ssh账号</label>
             <div class="col-md-7">
-              <input class="form-control" autocomplete="off" id="user" name="user" placeholder="请输入ssh账号">
+              <input class="form-control" autocomplete="off" id="user" name="user" value="{{.conf.User}}" placeholder="请输入ssh账号">
             </div>
           </div>
           <div class="form-group">
             <label class="col-md-3 control-label" for="example-hf-password">ssh密码</label>
             <div class="col-md-7">
-              <input class="form-control" autocomplete="off" id="pwd" name="pwd" placeholder="请输入ssh密码">
+              <input class="form-control" type="password" autocomplete="off" id="pwd" name="pwd" placeholder="请输入ssh密码">
             </div>
           </div>
           <div class="form-group">
             <label class="col-md-3 control-label" for="example-hf-password">Host</label>
             <div class="col-md-7">
-              <input class="form-control" autocomplete="off" id="host" name="host" placeholder="请输入ssh IP地址">
+              <input class="form-control" autocomplete="off" id="host" value="{{.conf.Host}}" name="host" placeholder="请输入ssh IP地址">
             </div>
           </div>
           <div class="form-group">
             <label class="col-md-3 control-label" for="example-hf-password">端口</label>
             <div class="col-md-7">
-              <input class="form-control" autocomplete="off" id="port" name="port" value="22" placeholder="请输入端口,默认22">
+              <input class="form-control" autocomplete="off" id="port"  name="port" value="22" placeholder="请输入端口,默认22">
             </div>
           </div>
           <div class="form-group">
             <label class="col-md-3 control-label" for="example-hf-password">路径</label>
             <div class="col-md-7">
-              <input class="form-control" autocomplete="off" id="source" name="source" placeholder="请输入源文件夹路径">
+              <input class="form-control" autocomplete="off" id="source" value="{{.conf.Source}}" name="source" placeholder="请输入源文件夹路径">
             </div>
+          </div>
+          <div class="form-group">
+            <label class="col-md-3 btn-block control-label" for="example-hf-password">是否保留图片到本地</label>
+            <label class="col-md-3 lyear-switch switch-solid switch-success">
+              <input type="checkbox" id="keep_local" name="keep_local" {{if eq .conf.KeepLocal 1}}checked=""{{end}}>
+              <span></span>
+            </label>
           </div>
           <div class="form-group">
             <div class="col-md-9 col-md-offset-3">
@@ -46,6 +53,7 @@
   </div>
 </div>
 {{template "frame_js"}}
+<script type="text/javascript" src="/static/admin/js/perfect-scrollbar.min.js"></script>
 <script src="/static/admin/js/bootstrap-notify.min.js"></script>
 <script type="text/javascript" src="/static/admin/js/lightyear.js"></script>
 <script>
@@ -69,7 +77,7 @@
         }
       },
       error : function(result) {
-        console.log(result.errorMsg)
+        console.log(result.msg)
         lightyear.loading('hide');  // 隐藏
         lightyear.notify('异常！' + result.msg, 'warning', 1000, 'mdi mdi-emoticon-happy', 'top', 'center');
       }

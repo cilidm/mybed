@@ -21,6 +21,7 @@ require (
 	github.com/minio/minio-go v6.0.14+incompatible
 	github.com/mitchellh/go-homedir v1.1.0 // indirect
 	github.com/o1egl/govatar v0.3.0
+	github.com/pkg/sftp v1.11.0
 	github.com/qiniu/api.v7/v7 v7.5.0
 	github.com/rs/xid v1.2.1
 	github.com/satori/go.uuid v1.2.0 // indirect
@@ -28,6 +29,7 @@ require (
 	github.com/tencentyun/cos-go-sdk-v5 v0.7.7
 	github.com/upyun/go-sdk v2.1.0+incompatible
 	github.com/yeqown/go-qrcode v1.2.1
+	golang.org/x/crypto v0.0.0-20191205180655-e7c4368fe9dd
 	golang.org/x/time v0.0.0-20200630173020-3af7569d3a1e // indirect
 	gopkg.in/alexcesaro/quotedprintable.v3 v3.0.0-20150716171945-2caba252f4dc // indirect
 	gopkg.in/gomail.v2 v2.0.0-20160411212932-81ebce5c23df // indirect

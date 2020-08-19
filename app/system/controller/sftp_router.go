@@ -11,7 +11,7 @@ func init() {
 	r.GET("sftp", sftp_controller.SftpPage)
 	r.GET("sftp_form", sftp_controller.SftpFormPage)
 	r.POST("sftp_form", sftp_controller.SftpFormHandler)
-	//r.GET("storemenu_json", store_list_controller.StoreSystemStorage)
+	r.GET("sftp_json", sftp_controller.SftpJson)
 	//r.POST("imgdata_del", store_list_controller.ImgdataDel)
 	//r.POST("imgdata_del_more", store_list_controller.ImgdataDelMore)
 }

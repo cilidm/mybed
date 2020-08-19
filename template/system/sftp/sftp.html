@@ -15,8 +15,7 @@
 
 <script type="text/html" id="toolbarDemo">
     <div class="layui-btn-container">
-        <button class="layui-btn layui-btn-sm btn-primary" onclick="createSftp()">创建同步</button>
-{{/*        <button class="layui-btn layui-btn-sm btn-danger" lay-event="getCheckData">删除</button>*/}}
+        <button class="layui-btn layui-btn-sm btn-primary" onclick="createSftp()">开始同步</button>
     </div>
 </script>
 
@@ -34,7 +33,7 @@
 
         table.render({
             elem: '#test'
-            ,url:'/system/code_json'
+            ,url:'/system/sftp_json'
             ,toolbar: '#toolbarDemo' //开启头部工具栏，并为其绑定左侧模板
             ,defaultToolbar: ['filter', 'exports', 'print', { //自定义头部工具栏右侧图标。如无需自定义，去除该参数即可
                 title: '提示'
@@ -43,17 +42,11 @@
             }]
             ,title: '用户数据表'
             ,cols: [[
-                {type: 'checkbox', fixed: 'left'}
-                ,{field:'Id', title:'ID', width:80, fixed: 'left', unresize: true, sort: true}
-                ,{field:'Code', title:'扩容码',  edit: 'text'}
-                ,{field:'Value', title:'容量(单位MB)',  edit: 'text'}
-                ,{field:'Status', title:'状态',width: 100,templet:function (res) {
-                    if (res.Status == "1"){return '<button class="layui-btn layui-btn-xs btn-success">未使用</button>'}
-                    if (res.Status == "2"){return '<button class="layui-btn layui-btn-xs btn-danger">已使用</button>'}
-                }}
-                ,{field:'UserName', title:'使用人'}
+                {field:'Id', title:'ID', width:80, unresize: true, sort: true}
+                ,{field:'ImgName', title:'图片名称',  edit: 'text'}
+                ,{field:'Sizes', title:'大小',  edit: 'text'}
+                ,{field:'Source', title:'存储源'}
                 ,{field:'CreatedAt', title:'生成日期',  edit: 'text', sort: true}
-                ,{field:'UpdatedAt', title:'使用日期',  edit: 'text', sort: true}
                 ,{fixed:'right', title:'操作', toolbar: '#barDemo', width:100}
             ]]
             ,page: true
@@ -62,56 +55,56 @@
             }
         });
         //头工具栏事件
-        table.on('toolbar(test)', function(obj){
-            var checkStatus = table.checkStatus(obj.config.id);
-            switch(obj.event){
-                case 'getCheckData':
-                    layer.confirm('真的删除吗？', function(index){
-                        var index = layer.load(1, {
-                            shade: [0.3,'#000'] //0.1透明度的白色背景
-                        });
-                        var data = checkStatus.data;
-                        var ids = new Array();
-                        for(let i in data){
-                            ids.push(data[i].Id)
-                        }
-                        $.ajax({
-                            //几个参数需要注意一下
-                            type: "POST",//方法类型
-                            dataType: "json",//预期服务器返回的数据类型
-                            url: "/system/code_dels" ,//url
-                            data: {"ids":ids},
-                            traditional:true,
-                            success: function (result) {
-                                if (result.resultCode == 200) {
-                                    layer.close(index);
-                                    layer.msg('删除成功')
-                                    setTimeout(function () {
-                                        location.reload();
-                                    },1000)
-                                }else{
-                                    layer.close(index);
-                                    layer.msg(result.msg);
-                                }
-                            },
-                        });
-                    });
-                    break;
-            };
-        });
+        // table.on('toolbar(test)', function(obj){
+        //     var checkStatus = table.checkStatus(obj.config.id);
+        //     switch(obj.event){
+        //         case 'getCheckData':
+        //             layer.confirm('真的删除吗？', function(index){
+        //                 var index = layer.load(1, {
+        //                     shade: [0.3,'#000'] //0.1透明度的白色背景
+        //                 });
+        //                 var data = checkStatus.data;
+        //                 var ids = new Array();
+        //                 for(let i in data){
+        //                     ids.push(data[i].Id)
+        //                 }
+        //                 $.ajax({
+        //                     //几个参数需要注意一下
+        //                     type: "POST",//方法类型
+        //                     dataType: "json",//预期服务器返回的数据类型
+        //                     url: "/system/code_dels" ,//url
+        //                     data: {"ids":ids},
+        //                     traditional:true,
+        //                     success: function (result) {
+        //                         if (result.resultCode == 200) {
+        //                             layer.close(index);
+        //                             layer.msg('删除成功')
+        //                             setTimeout(function () {
+        //                                 location.reload();
+        //                             },1000)
+        //                         }else{
+        //                             layer.close(index);
+        //                             layer.msg(result.msg);
+        //                         }
+        //                     },
+        //                 });
+        //             });
+        //             break;
+        //     };
+        // });
         //监听行工具事件
         table.on('tool(test)', function(obj){
             var data = obj.data;
             if(obj.event === 'del'){
-                layer.confirm('真的删除该扩容码？', function(index){
-                    $.post("/system/code_del",{"id":data.Id},function (res) {
+                layer.confirm('真的删除该图片吗？', function(index){
+                    $.post("/system/delImg",{"id":data.Id},function (res) {
                         if (res.resultCode == 200){
                             layer.msg("删除成功");
                             setTimeout(function () {
                                 location.reload();
                             },1000)
                         }else{
-                            layer.msg(res.msg);
+                            layer.msg(res.errorMsg);
                         }
                     })
                     layer.close(index);
@@ -119,7 +112,7 @@
             } else if(obj.event === 'copy'){
                 var copy = new ClipboardJS('.copyLink', {
                     text: function (trigger) {
-                        return  data.Code;
+                        return  data.ImgUrl;
                     }
                 });
                 copy.on('success', function (e) {
@@ -130,28 +123,6 @@
                     layer.msg("复制失败")
                     copy.off("error");
                 });
-            }else if(obj.event === 'show'){
-                // layer.open({
-                //     type: 1,
-                //     title: "",
-                //     skin: 'layui-layer-demo', //样式类名
-                //     closeBtn: 0, //不显示关闭按钮
-                //     anim: 2,
-                //     area: ['420px','420px'], //宽高
-                //     shadeClose: true, //开启遮罩关闭
-                //     content: "<img src='"+data.ImgUrl+"' width='100%'>"
-                // });
-            }else if(obj.event === "show_qrcode"){
-                {{/*layer.open({*/}}
-                {{/*    type: 1,*/}}
-                {{/*    title: "",*/}}
-                {{/*    skin: 'layui-layer-demo', //样式类名*/}}
-                {{/*    closeBtn: 0, //不显示关闭按钮*/}}
-                {{/*    anim: 2,*/}}
-                {{/*    area: ['300px','300px'], //宽高*/}}
-                {{/*    shadeClose: true, //开启遮罩关闭*/}}
-                {{/*    content: "<img src='{{.conf.WebUrl}}system/qrcode?url="+data.ImgUrl+"' width='100%'>"*/}}
-                {{/*});*/}}
             }
         });
     });
@@ -159,10 +130,10 @@
     function createSftp(){
         layer.open({
             type: 2,
-            title: '生成扩容码',
+            title: 'ssh同步',
             shadeClose: true,
             shade: 0.8,
-            area: ['380px', '300px'],
+            area: ['380px', '80%'],
             content: '/system/sftp_form' //iframe的url
         });
     }

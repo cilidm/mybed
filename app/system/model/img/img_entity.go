@@ -101,8 +101,19 @@ func GetImgdataBySource(source, page, limit int) (imgdata []Entity, count int) {
 	return
 }
 
-func GetImgdataByMd5(md5 string) Entity {
-	var img Entity
+func GetImgdataSftp(page, limit int) (imgdata []Entity, count int) {
+	pageSize := conf.Setting.PageSize
+	if limit > 0 {
+		pageSize = limit
+	}
+	offset := (page - 1) * pageSize
+	query := db.Where("img_type = 9")
+	query.Count(&count)
+	query.Order("id desc").Limit(pageSize).Offset(offset).Find(&imgdata)
+	return
+}
+
+func GetImgdataByMd5(md5 string) (img Entity) {
 	db.Where("md5 = ?", md5).First(&img)
 	return img
 }
@@ -127,7 +138,7 @@ func GetImgdataSize(userId int64) (size int, err error) {
 	return
 }
 
-func GetImgNumByDay() (l []Line,err error) {
+func GetImgNumByDay() (l []Line, err error) {
 	err = db.Raw("select DATE_FORMAT(created_at,'%m-%d') AS day, count(*) AS num from img_data group by day").Scan(&l).Error
 	return
 }
