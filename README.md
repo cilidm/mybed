@@ -35,7 +35,8 @@ git clone https://github.com/cilidm/mybed.git
 创建任意名称的数据库, 字符集选择 `utf8`, 排序规则选择 `utf8_general_ci`. 
 修改conf文件夹下`app.ini`文件，`[database]` 下的`DBUser DBPwd DBHost DBTableName` 四项 
 如果想使用sqlite3进行数据保存，可以修改`DBType = sqlite3` 此时 `DBPath` 就是数据文件保存地址
-注：如果是windows环境，使用sqlite3需要自行配置gcc
+注：如果是windows环境，使用sqlite3需要自行配置gcc。
+因为兼容性问题，如需使用sqlite3请到app/helper/db/db.go 把第七行sqlite3依赖的注释取消
 
 ### 配置文件
 
