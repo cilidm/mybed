@@ -4,6 +4,7 @@ import (
 	"github.com/gin-gonic/gin"
 	"mybedv2/app/helper/e"
 	"mybedv2/app/helper/util/str"
+	"mybedv2/app/system/controller/img_controller"
 	"mybedv2/app/system/model"
 	"mybedv2/app/system/model/img"
 	"mybedv2/app/system/model/site"
@@ -22,7 +23,7 @@ func StoreSystem(c *gin.Context) {
 	c.HTML(http.StatusOK, "store_system_list.html", gin.H{"type": storeType, "conf": conf})
 }
 
-//读取数据库存储的数据
+// 读取数据库存储的数据
 func StoreSystemStorage(c *gin.Context) {
 	storeType := c.Query("type")
 	page, _ := strconv.Atoi(c.DefaultQuery("page", "1"))
@@ -56,12 +57,10 @@ func StoreSystemStorage(c *gin.Context) {
 
 func ImgdataDelMore(c *gin.Context) {
 	ids := c.PostFormArray("ids")
-	storeType := c.PostForm("type")
-	for _, v := range ids {
-		id, _ := strconv.Atoi(v)
-		err := ImgdataDelHandler(id, storeType)
-		if err != nil {
-			c.JSON(http.StatusOK, model.AjaxResp{ResultCode: e.ERROR, ErrorMsg: e.GetMsg(e.ERROR) + err.Error()})
+	imgs := img.GetImgdataByArr(ids)
+	for _, v := range imgs {
+		if err := img_controller.DelImgDomain(v); err != nil {
+			c.JSON(http.StatusOK, model.AjaxResp{ErrorMsg: err.Error(), ResultCode: -1})
 			return
 		}
 	}
@@ -69,11 +68,14 @@ func ImgdataDelMore(c *gin.Context) {
 }
 
 func ImgdataDel(c *gin.Context) {
-	id, _ := strconv.Atoi(c.PostForm("id"))
-	storeType := c.PostForm("type")
-	err := ImgdataDelHandler(id, storeType)
+	id, err := strconv.Atoi(c.PostForm("id"))
 	if err != nil {
-		c.JSON(http.StatusOK, model.AjaxResp{ResultCode: e.ERROR, ErrorMsg: e.GetMsg(e.ERROR) + err.Error()})
+		c.JSON(http.StatusOK, model.AjaxResp{ErrorMsg: err.Error(), ResultCode: -1})
+		return
+	}
+	img := img.GetImgdataById(id)
+	if err := img_controller.DelImgDomain(img); err != nil {
+		c.JSON(http.StatusOK, model.AjaxResp{ErrorMsg: err.Error(), ResultCode: -1})
 		return
 	}
 	c.JSON(http.StatusOK, model.AjaxResp{ResultCode: e.SUCCESS, Msg: e.GetMsg(e.SUCCESS)})

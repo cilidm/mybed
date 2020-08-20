@@ -25,7 +25,7 @@ type Info struct {
 	Avatar        string    `json:"avatar"`
 	Nickname      string    `json:"nickname"`
 	Level         int64     `json:"level"`
-	Memory        int64     `json:"memory"`
+	Memory        string    `json:"memory"`
 	UsedMem       string    `json:"used_mem"`
 	UsedPer       int64     `json:"used_per"`
 	LastLoginTime time.Time `json:"last_login_time"`

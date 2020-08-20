@@ -2,14 +2,19 @@ package baidu
 
 import (
 	"encoding/json"
+	"errors"
 	"fmt"
+	"github.com/gin-gonic/gin"
 	"io/ioutil"
 	"mybedv2/app/helper/redis"
 	_ "mybedv2/app/helper/redis"
 	"mybedv2/app/helper/util/str"
 	"mybedv2/app/system/model/bd/bd_img"
+	"mybedv2/app/system/model/blacklist/img_blacklist"
+	"mybedv2/app/system/service/user"
 	"net/http"
 	"net/url"
+	"os"
 	"strings"
 	"time"
 )
@@ -117,4 +122,29 @@ func GetIdentificationResult(filePath string, sourceType int) (Resp, error) {
 		return Resp{}, err
 	}
 	return res, nil
+}
+
+// 通用图片审核，传图片本地路径+md5
+func BdPicExamine(fileTmpPath, md5 string, c *gin.Context) error {
+	bdResp, err := GetIdentificationResult(fileTmpPath, 1)
+	if err != nil {
+		return err
+	}
+	if bdResp.ConclusionType != 1 {
+		fs, _ := os.Stat(fileTmpPath)
+		var blist img_blacklist.Entity
+		err := blist.Insert(img_blacklist.BindForm{
+			Info:     bdResp.Conclusion + ":" + bdResp.Data[0].Msg,
+			UserIp:   c.ClientIP(),
+			UserId:   int(user.GetUserId(c)),
+			FileName: fs.Name(),
+			FileSize: fs.Size(),
+			FileMd5:  md5,
+		})
+		if err != nil {
+			return err
+		}
+		return errors.New(bdResp.Conclusion + ":" + bdResp.Data[0].Msg)
+	}
+	return nil
 }

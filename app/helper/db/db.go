@@ -4,6 +4,7 @@ import (
 	"fmt"
 	"github.com/jinzhu/gorm"
 	_ "github.com/jinzhu/gorm/dialects/mysql"
+	_ "github.com/jinzhu/gorm/dialects/sqlite"
 	"log"
 	"mybedv2/app/helper/util/pathdir"
 	"mybedv2/conf"
@@ -25,7 +26,7 @@ func Instance() *gorm.DB {
 				conf.Setting.DBPwd,
 				conf.Setting.DBHost,
 				conf.Setting.DBTableName))
-		} else if conf.Setting.DBType == "sqlite" {
+		} else if conf.Setting.DBType == "sqlite3" {
 			db, err = gorm.Open(conf.Setting.DBType, conf.Setting.DBPath)
 			if err != nil {
 				if err := pathdir.CreateFile(conf.Setting.DBPath); err != nil {

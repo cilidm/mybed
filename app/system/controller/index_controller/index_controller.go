@@ -3,10 +3,12 @@ package index_controller
 import (
 	"fmt"
 	"github.com/gin-gonic/gin"
+	"mybedv2/app/helper/baidu"
 	"mybedv2/app/helper/e"
 	"mybedv2/app/helper/util/pathdir"
 	"mybedv2/app/helper/util/str"
 	"mybedv2/app/system/model"
+	"mybedv2/app/system/model/bd/bd_img"
 	"mybedv2/app/system/model/blacklist/img_blacklist"
 	imgModel "mybedv2/app/system/model/img"
 	"mybedv2/app/system/model/site"
@@ -122,8 +124,9 @@ func ProfilePage(c *gin.Context) {
 		userShow.UsedPer = 0
 	} else {
 		userShow.UsedMem = str.SizeFormat(float64(used))
-		userShow.UsedPer = (int64(used) / (userShow.Memory * 1024 * 1024)) * 100
+		userShow.UsedPer = (int64(used) / (user.Memory * 1024 * 1024)) * 100
 	}
+	userShow.Memory = str.SizeFormat(float64(user.Memory * 1024 * 1024))
 	c.HTML(http.StatusOK, "profile.html", userShow)
 }
 
@@ -148,6 +151,21 @@ func ProfileUpload(c *gin.Context) {
 	saveDir := "static/upload/" + uid + "/avatar/"
 	pathdir.PathExists(saveDir)
 	c.SaveUploadedFile(file, saveDir+file.Filename)
+
+	md5, _ := pathdir.GetMd5V1(saveDir + file.Filename)
+	blackList := img_blacklist.FindByMd5(md5)
+	if blackList > 0 { //在图片黑名单
+		c.JSON(http.StatusOK, model.AjaxResp{Msg: "此图片未通过审核", ResultCode: e.SUCCESS})
+		return
+	}
+	imgExamine := bd_img.FindOne()
+	//百度图片审核
+	if imgExamine.Status == 1 {
+		if err := baidu.BdPicExamine(saveDir+file.Filename, md5, c); err != nil {
+			c.JSON(http.StatusOK, model.AjaxResp{Msg: "此图片未通过审核" + err.Error(), ResultCode: e.SUCCESS})
+			return
+		}
+	}
 	var siteEntity site.Entity
 	conf := siteEntity.FindOne()
 	user2.UpdateUserAvatar(uid, conf.WebUrl+saveDir+file.Filename)

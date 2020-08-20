@@ -34,8 +34,8 @@ git clone https://github.com/cilidm/mybed.git
 
 创建任意名称的数据库, 字符集选择 `utf8`, 排序规则选择 `utf8_general_ci`. 
 修改conf文件夹下`app.ini`文件，`[database]` 下的`DBUser DBPwd DBHost DBTableName` 四项 
-如果想使用sqlite3进行数据保存，可以修改`DBType = sqlite` 此时 `DBPath` 就是数据文件保存地址
-注：如果是windows环境，使用sqlite需要自行配置gcc
+如果想使用sqlite3进行数据保存，可以修改`DBType = sqlite3` 此时 `DBPath` 就是数据文件保存地址
+注：如果是windows环境，使用sqlite3需要自行配置gcc
 
 ### 配置文件
 
@@ -59,7 +59,7 @@ DBUser = root       # 数据库账号名
 DBPwd = 123456      # 数据库密码
 DBHost = 127.0.0.1:3306 # 数据库地址+端口号
 DBTableName = mytbed    # 表名
-DBPath = mybed.db   # sqlite保存地址
+DBPath = mybed.db   # sqlite3保存地址
 
 [redis]
 RedisAddr = 127.0.0.1:6379  # Redis地址
@@ -79,7 +79,7 @@ RedisDB =       # RedisDB
 
 ### 声明
 
-本程序很多功能尚未完善，用做对外开放的图床时请注意配置图像审核，默认百度图像审核，请在设置里填写key secret。
+本程序部分功能尚未完善，用做对外开放的图床时请注意配置图像审核，默认百度图像审核，请在设置里填写key secret。
 
 ### 反馈交流
 
@@ -94,7 +94,7 @@ RedisDB =       # RedisDB
 
 ### 开发计划
 
-- [ ] Store功能调整测试
+- [ ] Store功能调整测试(剩下的两个不想测试了，有bug可以联系我修改)
     - [x] 阿里云
     - [x] 七牛云
     - [x] 又拍云
@@ -102,12 +102,16 @@ RedisDB =       # RedisDB
     - [x] 腾讯云
     - [ ] 百度云
     - [ ] 华为云
+- [x] ssh服务器文件迁移
+- [x] 同一个store更换密钥后无法删除
+- [x] 鉴黄提示修改
+- [ ] Windows环境下上传文件路径问题(已修复，待验证)
 - [ ] 日志功能
 - [ ] 水印功能
 - [ ] IP黑名单拦截
-- [ ] 游客每日上传数量限制(ip统计)
-- [ ] 部分栏目增加搜索功能
+- [ ] 游客每日上传数量限制(ip)
+- [ ] 搜索功能
 - [ ] store实时管理
-- [x] ssh服务器文件迁移
-- [ ] 同一个store更换密钥后无法删除(加入验证文件是否存在，成功删除后才删除数据库)
-- [x] 鉴黄修改
+- [ ] ico上传及使用
+- [ ] 图片文件打包下载
+- [ ] 文件超期删除

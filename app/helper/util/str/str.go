@@ -14,6 +14,11 @@ import (
 	"time"
 )
 
+func GetStoreFileName(url string) string {
+	str := strings.Split(url, "/")
+	return str[len(str)-3] + "/" + str[len(str)-2] + "/" + str[len(str)-1]
+}
+
 func Struct2Str(s interface{}) string {
 	return strings.Replace(strings.Trim(fmt.Sprint(s), "[]"), " ", ",", -1)
 }

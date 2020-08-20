@@ -40,7 +40,7 @@ layui.use('upload', function(){
             if(res.resultCode == 200){
                 $('#file_list_one_pic').attr('src',res.msg);
             }else{
-                return layer.msg('上传失败');
+                return layer.msg('上传失败' + res.msg);
             }
         }
     });

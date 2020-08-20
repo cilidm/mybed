@@ -17,7 +17,6 @@ require (
 	github.com/go-ini/ini v1.57.0
 	github.com/go-redis/redis v6.14.2+incompatible
 	github.com/jinzhu/gorm v1.9.15
-	github.com/koyachi/go-nude v0.0.1
 	github.com/minio/minio-go v6.0.14+incompatible
 	github.com/mitchellh/go-homedir v1.1.0 // indirect
 	github.com/o1egl/govatar v0.3.0

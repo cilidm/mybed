@@ -7,7 +7,6 @@ import (
 	"mime/multipart"
 	"mybedv2/app/helper/baidu"
 	"mybedv2/app/helper/e"
-	"mybedv2/app/helper/redis"
 	"mybedv2/app/helper/util/pathdir"
 	"mybedv2/app/helper/util/str"
 	"mybedv2/app/system/model"
@@ -23,6 +22,7 @@ import (
 	"os"
 	"path"
 	"path/filepath"
+	"runtime"
 	"strconv"
 	"time"
 )
@@ -58,7 +58,7 @@ func UploadImpl(files []*multipart.FileHeader, c *gin.Context) (model.UploadResp
 	// 上传临时文件夹 static/upload/日期小时
 	uploadTmp := path.Join(conf.Setting.UploadTmpDir, time.Now().Format(e.HourTimeFormatDir))
 	pathdir.PathExists(uploadTmp)
-	redis.Client.SAdd(e.TempDirList, uploadTmp) //加入待删除文件夹 每天删除一次
+	//redis.Client.SAdd(e.TempDirList, uploadTmp) //加入待删除文件夹 每天删除一次
 	// 获取所有图片
 	for _, file := range files {
 		//获取userid  如果是同一个人传的图片已存在 则直接返回 如果是不同人传的图片 则直接入库 user_imgdata
@@ -78,7 +78,7 @@ func UploadImpl(files []*multipart.FileHeader, c *gin.Context) (model.UploadResp
 			return model.UploadResp{Code: strconv.Itoa(e.ErrorUploadSave), Info: e.GetMsg(e.ErrorUploadSave)}, errors.New("此图片禁止上传")
 		}
 		imgExamine := bd_img.FindOne()
-		if imgExamine.Status == 1 {
+		if imgExamine.Status == 1 { //百度图片审核
 			bdResp, err := baidu.GetIdentificationResult(fileTmpPath, 1)
 			if err != nil {
 				return model.UploadResp{Code: strconv.Itoa(e.ErrorUploadSave), Info: e.GetMsg(e.ErrorUploadSave)}, err
@@ -129,13 +129,18 @@ func uploadSave(fileTmpPath, fileName string, uid int64, c *gin.Context, resp *m
 		resp.Data = append(resp.Data, model.ImgInfo{Imgnames: img.ImgName, Imgurls: img.ImgUrl})
 	} else {
 		//上传原图
-		// todo 将store初始化方法解藕
 		cs, err := storeService.NewCloudStore(false)
 		if err != nil {
 			return model.UploadResp{Code: strconv.Itoa(e.ErrorUploadStore), Info: e.GetMsg(e.ErrorUploadStore) + err.Error()}, err
 		}
 		//store路径 userid + file.Filename
-		storePath := filepath.Join(e.StroeDefaultDir, strconv.FormatInt(uid, 10)+"/"+fileName)
+		var storePath string
+		sysType := runtime.GOOS
+		if sysType == "windows" {
+			storePath = e.StroeDefaultDir + "/" + strconv.FormatInt(uid, 10) + "/" + fileName
+		} else {
+			storePath = filepath.Join(e.StroeDefaultDir, strconv.FormatInt(uid, 10)+"/"+fileName)
+		}
 		//直接写入store
 		miMe := mime.TypeByExtension(path.Ext(fileTmpPath))
 		if err = cs.Upload(fileTmpPath, storePath, map[string]string{"Content-Type": miMe}); err != nil {
@@ -151,7 +156,6 @@ func uploadSave(fileTmpPath, fileName string, uid int64, c *gin.Context, resp *m
 			mcPath = csc.PublicBucketDomain + storePath
 		}
 		//图片信息入库
-		//imgId, err := imgService.CreateImgdata(fileTmpPath, mcPath, c.ClientIP(), md5, uid, csc.CloudType)
 		_, err = imgService.CreateImgdata(fileTmpPath, mcPath, c.ClientIP(), md5, uid, csc.CloudType)
 		if err != nil {
 			return model.UploadResp{Code: strconv.Itoa(e.ErrorSaveImgdata), Info: e.GetMsg(e.ErrorSaveImgdata) + err.Error()}, err

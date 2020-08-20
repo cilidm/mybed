@@ -1,6 +1,7 @@
 package img_controller
 
 import (
+	"errors"
 	"fmt"
 	"github.com/gin-gonic/gin"
 	"mybedv2/app/helper/util/page"
@@ -81,20 +82,22 @@ func DelImgList(c *gin.Context) {
 func DelImgDomain(v img.Entity) error {
 	var imgEntity img.Entity
 	cloudType := store.GetStoreStr(v.Source)
-	csc := store.GetStoreConfig("cloud_type", cloudType) //todo 每次都要查数据库里store配置 修改为查询缓存？
+	csc := store.GetStoreConfig("cloud_type", cloudType)
 	config := storeService.GetConfigType(csc)
 	private := false
-	cs, err := storeService.NewCloudStoreWithConfig(config, csc.CloudType, private) //todo 修改为创建相应的连接池，直接根据不同store调用
+	cs, err := storeService.NewCloudStoreWithConfig(config, csc.CloudType, private)
 	if err != nil {
 		fmt.Println(err)
 		return err
 	}
-	var file string
-	imgArr := strings.Split(v.ImgUrl, "/")
-	file = imgArr[len(imgArr)-3] + "/" + imgArr[len(imgArr)-2] + "/" + imgArr[len(imgArr)-1]
-	cs.Delete(file)              //删除store原图
-	err = imgEntity.Delete(v.Id) //删除数据库
-	if err != nil {
+	fileName := str.GetStoreFileName(v.ImgUrl)
+	if err := cs.IsExist(fileName); err != nil {
+		return errors.New("文件不存在，是否更换了存储源？")
+	}
+	if err := cs.Delete(fileName); err != nil { // 删除store原图
+		return err
+	}
+	if err := imgEntity.Delete(v.Id); err != nil { // 删除数据库
 		return err
 	}
 	return nil
