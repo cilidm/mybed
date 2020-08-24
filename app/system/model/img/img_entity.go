@@ -101,6 +101,18 @@ func GetImgdataBySource(source, page, limit int) (imgdata []Entity, count int) {
 	return
 }
 
+func GetImgdataLocal(page, limit int) (imgdata []Entity, count int) {
+	pageSize := conf.Setting.PageSize
+	if limit > 0 {
+		pageSize = limit
+	}
+	offset := (page - 1) * pageSize
+	query := db.Where("img_type = 8")
+	query.Count(&count)
+	query.Order("id desc").Limit(pageSize).Offset(offset).Find(&imgdata)
+	return
+}
+
 func GetImgdataSftp(page, limit int) (imgdata []Entity, count int) {
 	pageSize := conf.Setting.PageSize
 	if limit > 0 {

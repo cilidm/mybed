@@ -1,0 +1,106 @@
+<!DOCTYPE html>
+<html>
+<head>
+    <meta charset="utf-8">
+    <title>Layui</title>
+    <meta name="renderer" content="webkit">
+    <meta http-equiv="X-UA-Compatible" content="IE=edge,chrome=1">
+    <meta name="viewport" content="width=device-width, initial-scale=1, maximum-scale=1">
+    <link rel="stylesheet" href="/static/home/layui/layui/css/layui.css"  media="all">
+    {{template "layui_frame_css"}}
+</head>
+<body>
+
+<table class="layui-hide" id="test" lay-filter="test"></table>
+
+<script type="text/html" id="toolbarDemo">
+    <div class="layui-btn-container">
+        <button class="layui-btn layui-btn-sm btn-primary" onclick="createSftp()">开始同步</button>
+    </div>
+</script>
+
+<script type="text/html" id="barDemo">
+    <a class="copyLink layui-btn btn-primary layui-btn-xs" lay-event="copy" ><i class="layui-icon" onmouseover="layer.tips('点击复制', this, {tips: [3, '#000']});">&#xe64c;</i></a>
+    <a class="layui-btn btn-danger layui-btn-xs" lay-event="del"><i class="layui-icon">&#xe640;</i> </a>
+</script>
+
+<script src="/static/home/layui/layui/layui.js" charset="utf-8"></script>
+<script src="/static/home/clipboard.min.js"></script>
+<script>
+    layui.use(['jquery','table','element','layer'], function(){
+        var table = layui.table,form = layui.form,layer = layui.layer,
+            $ = layui.$,element = layui.element;
+
+        table.render({
+            elem: '#test'
+            ,url:'/system/local_json'
+            ,toolbar: '#toolbarDemo' //开启头部工具栏，并为其绑定左侧模板
+            ,defaultToolbar: ['filter', 'exports', 'print', { //自定义头部工具栏右侧图标。如无需自定义，去除该参数即可
+                title: '提示'
+                ,layEvent: 'LAYTABLE_TIPS'
+                ,icon: 'layui-icon-tips'
+            }]
+            ,title: '数据'
+            ,cols: [[
+                {field:'Id', title:'ID', width:80, unresize: true, sort: true}
+                ,{field:'ImgName', title:'图片名称',  edit: 'text'}
+                ,{field:'Sizes', title:'大小',  edit: 'text'}
+                ,{field:'Source', title:'存储源'}
+                ,{field:'CreatedAt', title:'生成日期',  edit: 'text', sort: true}
+                ,{fixed:'right', title:'操作', toolbar: '#barDemo', width:100}
+            ]]
+            ,page: true
+            ,done:function (res,currentCount) {
+                element.render();
+            }
+        });
+
+        //监听行工具事件
+        table.on('tool(test)', function(obj){
+            var data = obj.data;
+            if(obj.event === 'del'){
+                layer.confirm('真的删除该图片吗？', function(index){
+                    $.post("/system/delImg",{"id":data.Id},function (res) {
+                        if (res.resultCode == 200){
+                            layer.msg("删除成功");
+                            setTimeout(function () {
+                                location.reload();
+                            },1000)
+                        }else{
+                            layer.msg(res.errorMsg);
+                        }
+                    })
+                    layer.close(index);
+                });
+            } else if(obj.event === 'copy'){
+                var copy = new ClipboardJS('.copyLink', {
+                    text: function (trigger) {
+                        return  data.ImgUrl;
+                    }
+                });
+                copy.on('success', function (e) {
+                    layer.msg("复制成功")
+                    copy.off("success");
+                });
+                copy.on('error', function (e) {
+                    layer.msg("复制失败")
+                    copy.off("error");
+                });
+            }
+        });
+    });
+
+    function createSftp(){
+        layer.open({
+            type: 2,
+            title: 'ssh同步',
+            shadeClose: true,
+            shade: 0.8,
+            area: ['380px', '80%'],
+            content: '/system/local_form' //iframe的url
+        });
+    }
+</script>
+
+</body>
+</html>
