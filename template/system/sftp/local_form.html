@@ -11,34 +11,18 @@
           <div class="form-group">
             <label class="col-md-3 control-label" for="example-hf-email">本地路径</label>
             <div class="col-md-7">
-              <input class="form-control" autocomplete="off" id="paths" name="paths" value="{{.conf.Paths}}" placeholder="请输入ssh账号">
+              <input class="form-control" autocomplete="off" id="paths" name="paths" value="{{.conf.Paths}}" placeholder="请输入本地路径">
             </div>
           </div>
           <div class="form-group">
             <label class="col-md-3 control-label" for="example-hf-password">路径注释</label>
             <div class="col-md-7">
               <input class="form-control" autocomplete="off" id="base" name="base" value="{{.conf.Base}}" placeholder="需要去掉的路径地址">
+              <br/>
+              <small class="help-block">如路径D:/aa/bb/cc.jpg，需要云端保存路径为bb/cc.jpg</small>
+              <small class="help-block">则填写D:/aa/即可</small>
             </div>
-            <small>如路径D:/aa/bb/cc.jpg，云端保存路径为bb/cc.jpg则填写D:/aa即可</small>
           </div>
-{{/*          <div class="form-group">*/}}
-{{/*            <label class="col-md-3 control-label" for="example-hf-password">Host</label>*/}}
-{{/*            <div class="col-md-7">*/}}
-{{/*              <input class="form-control" autocomplete="off" id="host" value="{{.conf.Host}}" name="host" placeholder="请输入ssh IP地址">*/}}
-{{/*            </div>*/}}
-{{/*          </div>*/}}
-{{/*          <div class="form-group">*/}}
-{{/*            <label class="col-md-3 control-label" for="example-hf-password">端口</label>*/}}
-{{/*            <div class="col-md-7">*/}}
-{{/*              <input class="form-control" autocomplete="off" id="port"  name="port" value="22" placeholder="请输入端口,默认22">*/}}
-{{/*            </div>*/}}
-{{/*          </div>*/}}
-{{/*          <div class="form-group">*/}}
-{{/*            <label class="col-md-3 control-label" for="example-hf-password">路径</label>*/}}
-{{/*            <div class="col-md-7">*/}}
-{{/*              <input class="form-control" autocomplete="off" id="source" value="{{.conf.Source}}" name="source" placeholder="请输入源文件夹路径">*/}}
-{{/*            </div>*/}}
-{{/*          </div>*/}}
           <div class="form-group">
             <label class="col-md-3 btn-block control-label" for="example-hf-password">是否保留本地图片</label>
             <label class="col-md-3 lyear-switch switch-solid switch-success">
@@ -68,7 +52,7 @@
       //几个参数需要注意一下
       type: "POST",//方法类型
       dataType: "json",//预期服务器返回的数据类型
-      url: "/system/sftp_form" ,//url
+      url: "/system/local_form" ,//url
       data: $('#codeForm').serialize(),
       success: function (result) {
         lightyear.loading('hide');  // 隐藏

@@ -17,13 +17,13 @@ import (
 )
 
 func LocalPage(c *gin.Context) {
-	c.HTML(http.StatusOK, "sftp.html", gin.H{})
+	c.HTML(http.StatusOK, "local.html", gin.H{})
 }
 
 func LocalJson(c *gin.Context) {
 	page, _ := strconv.Atoi(c.DefaultQuery("page", "1"))
 	limit, _ := strconv.Atoi(c.DefaultQuery("limit", "10"))
-	datas, count := img.GetImgdataSftp(page, limit)
+	datas, count := img.GetImgdataLocal(page, limit)
 	var dataMap []map[string]interface{}
 	for _, v := range datas {
 		dataMap = append(dataMap, str.Struct2Map(img.PageJson{
@@ -41,7 +41,7 @@ func LocalJson(c *gin.Context) {
 }
 
 func LocalFormPage(c *gin.Context) {
-	var b sftp.SftpBindForm
+	var b sftp.Local2StoreForm
 	confJson, _ := redis.Client.Get("local:form:" + strconv.Itoa(int(user.GetUserId(c)))).Result()
 	if confJson != "" {
 		json.Unmarshal([]byte(confJson), &b)
@@ -50,7 +50,7 @@ func LocalFormPage(c *gin.Context) {
 }
 
 func LocalFormHandler(c *gin.Context) {
-	var b sftp.SftpBindForm
+	var b sftp.Local2StoreForm
 	if err := c.Bind(&b); err != nil {
 		c.JSON(http.StatusOK, model.AjaxResp{ResultCode: e.ERROR, Msg: e.GetMsg(e.ERROR)})
 		return
@@ -63,22 +63,9 @@ func LocalFormHandler(c *gin.Context) {
 	}
 	formJson, _ := json.Marshal(b)
 	uid := strconv.Itoa(int(user.GetUserId(c)))
-	redis.Client.Set("sftp:form:"+uid, formJson, 0)
-	err := sftp.NewSftp(sftp.SftpConf{
-		Config: sftp.Config{
-			Host: b.Host,
-			User: b.User,
-			Pwd:  b.Pwd,
-			Port: b.Port,
-		},
-		Source:    b.Source,
-		Target:    conf.Setting.UploadTmpDir + "/sftp/" + uid,
-		KeepLocal: b.KeepLocal,
-		Uid:       strconv.Itoa(int(user.GetUserId(c))),
-		ClientIP:  c.ClientIP(),
-	})
-	if err != nil {
-		c.JSON(http.StatusOK, model.AjaxResp{ResultCode: e.ERROR, Msg: e.GetMsg(e.ERROR)})
+	redis.Client.Set("local:form:"+uid, formJson, 0)
+	if err := sftp.Local2Store(b); err != nil {
+		c.JSON(http.StatusOK, model.AjaxResp{ResultCode: e.ERROR, Msg: e.GetMsg(e.ERROR) + err.Error()})
 		return
 	}
 	c.JSON(http.StatusOK, model.AjaxResp{ResultCode: e.SUCCESS, Msg: e.GetMsg(e.SUCCESS)})
